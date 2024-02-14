@@ -1,0 +1,39 @@
+
+
+ons-tabbar[modifier="ktabbar_bottom"]{
+top:125px !important;
+}
+
+.menu{
+margin-top: -20px;
+}
+
+ons-tabbar[position="top"]{
+top: 0 !important;
+}
+.tabbar--ktabbar_top{
+padding-top: 0 !important;
+}
+
+#push_list .top_options{
+margin-top: -20px !important;
+}
+
+.back-button{
+position: relative;
+}
+
+html[onsflag-iphonex-portrait] .tabbar--top__content{
+top:50px !important;
+}
+
+.frm_profile{
+margin-top:30px;
+}
+
+.page--kpage_pullhook ons-toolbar{	   	   
+height: 44px !important;
+}
+.page--kpage_pullhook ons-back-button{	   
+top: 0px !important;
+}

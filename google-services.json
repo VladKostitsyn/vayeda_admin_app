@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "165429674468",
+    "project_id": "vayeda-d3813",
+    "storage_bucket": "vayeda-d3813.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:165429674468:android:caadf1fa83aba5eb7cc7f1",
+        "android_client_info": {
+          "package_name": "com.vayeda.admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "165429674468-71e226pfiilkee7haf1lbvlmse58sqkp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApn1OiSA4s-3NmWXkI2IepWUIx8x6PzPQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "165429674468-71e226pfiilkee7haf1lbvlmse58sqkp.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "165429674468-8cnq48ncc2l7b38mj54j99nlck0fa4vo.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.vayeda.client"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:165429674468:android:0fa58a547291f3da7cc7f1",
+        "android_client_info": {
+          "package_name": "com.vayeda.client"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "165429674468-71e226pfiilkee7haf1lbvlmse58sqkp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApn1OiSA4s-3NmWXkI2IepWUIx8x6PzPQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "165429674468-71e226pfiilkee7haf1lbvlmse58sqkp.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "165429674468-8cnq48ncc2l7b38mj54j99nlck0fa4vo.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.vayeda.client"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

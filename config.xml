@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:gap="http://phonegap.com/ns/1.0" id="com.vayeda.admin" version="0.0.3" versionCode="1.1.2">
+  <name>Админ Вайеда</name>
+  <description>Админ Вайеда</description>
+  <author email="bastikikang@gmail.com" href="http://cordova.io">
+        bastisapp.com
+    </author>
+  <content src="index.html"/>
+  <preference name="AndroidXEnabled" value="true"/>
+  <preference name="android-minSdkVersion" value="22"/>
+  <preference name="android-targetSdkVersion" value="29"/>
+  <allow-navigation href="*"/>
+  <allow-intent href="itms:*"/>
+  <allow-intent href="itms-apps:*"/>
+  <gap:config-file parent="/manifest" platform="android">
+    <supports-screens android:largeScreens="true" android:smallScreens="true" android:xlargeScreens="true"/>
+    <application android:theme="@android:style/Theme.NoTitleBar">
+        </application>
+  </gap:config-file>
+  <platform name="android">
+    <config-file parent="/manifest" target="AndroidManifest.xml">
+      <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+      <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+      <uses-permission android:name="android.permission.BLUETOOTH"/>
+      <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    </config-file>
+    <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
+      <application android:usesCleartextTraffic="true"/>
+    </edit-config>
+    <resource-file src="www/sounds/neworder.mp3" target="app/src/main/res/raw/neworder.mp3"/>
+    <resource-file src="google-services.json" target="google-services.json"/>
+    <resource-file src="google-services.json" target="app/google-services.json"/>
+    <splash density="land-ldpi" src="resources/android/splash/drawable-land-ldpi-screen.png"/>
+    <splash density="land-mdpi" src="resources/android/splash/drawable-land-mdpi-screen.png"/>
+    <splash density="land-hdpi" src="resources/android/splash/drawable-land-hdpi-screen.png"/>
+    <splash density="land-xhdpi" src="resources/android/splash/drawable-land-xhdpi-screen.png"/>
+    <splash density="land-xxhdpi" src="resources/android/splash/drawable-land-xxhdpi-screen.png"/>
+    <splash density="land-xxxhdpi" src="resources/android/splash/drawable-land-xxxhdpi-screen.png"/>
+    <preference name="android-targetSdkVersion" value="33"/>
+    <icon src="/resources/android/icon/drawable-ldpi-icon.png" density="ldpi"/>
+    <icon src="/resources/android/icon/drawable-mdpi-icon.png" density="mdpi"/>
+    <icon src="/resources/android/icon/drawable-hdpi-icon.png" density="hdpi"/>
+    <icon src="/resources/android/icon/drawable-xhdpi-icon.png" density="xhdpi"/>
+    <icon src="/resources/android/icon/drawable-xxhdpi-icon.png" density="xxhdpi"/>
+    <icon src="/resources/android/icon/drawable-xxxhdpi-icon.png" density="xxxhdpi"/>
+    <preference name="AndroidWindowSplashScreenBackground" value="#468fff"/>
+    <splash src="/resources/android/splash/drawable-port-ldpi-screen.png" density="port-ldpi"/>
+    <splash src="/resources/android/splash/drawable-port-mdpi-screen.png" density="port-mdpi"/>
+    <splash src="/resources/android/splash/drawable-port-hdpi-screen.png" density="port-hdpi"/>
+    <splash src="/resources/android/splash/drawable-port-xhdpi-screen.png" density="port-xhdpi"/>
+    <splash src="/resources/android/splash/drawable-port-xxhdpi-screen.png" density="port-xxhdpi"/>
+    <splash src="/resources/android/splash/drawable-port-xxxhdpi-screen.png" density="port-xxxhdpi"/>
+    <splash src="/res/android/screen/splash-mdpi.png" density="mdpi"/>
+  </platform>
+  <platform name="ios">
+    <allow-intent href="tel:*"/>
+    <resource-file src="www/sounds/neworder.mp3"/>
+    <preference name="WKWebViewOnly" value="true"/>
+    <feature name="CDVWKWebViewEngine">
+      <param name="ios-package" value="CDVWKWebViewEngine"/>
+    </feature>
+    <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine"/>
+    <preference name="scheme" value="monaca-app"/>
+    <preference name="hostname" value="localhost"/>
+    <icon height="20" platform="ios" src="res/icons/ios/icon-20.png" width="20"/>
+    <icon height="57" platform="ios" src="res/icons/ios/icon.png" width="57"/>
+    <icon height="114" platform="ios" src="res/icons/ios/icon@2x.png" width="114"/>
+    <icon height="40" platform="ios" src="res/icons/ios/icon-40.png" width="40"/>
+    <icon height="80" platform="ios" src="res/icons/ios/icon-40@2x.png" width="80"/>
+    <icon height="50" platform="ios" src="res/icons/ios/icon-50.png" width="50"/>
+    <icon height="100" platform="ios" src="res/icons/ios/icon-50@2x.png" width="100"/>
+    <icon height="60" platform="ios" src="res/icons/ios/icon-60.png" width="60"/>
+    <icon height="120" platform="ios" src="res/icons/ios/icon-60@2x.png" width="120"/>
+    <icon height="180" platform="ios" src="res/icons/ios/icon-60@3x.png" width="180"/>
+    <icon height="72" platform="ios" src="res/icons/ios/icon-72.png" width="72"/>
+    <icon height="144" platform="ios" src="res/icons/ios/icon-72@2x.png" width="144"/>
+    <icon height="76" platform="ios" src="res/icons/ios/icon-76.png" width="76"/>
+    <icon height="152" platform="ios" src="res/icons/ios/icon-76@2x.png" width="152"/>
+    <icon height="29" platform="ios" src="res/icons/ios/icon-small.png" width="29"/>
+    <icon height="58" platform="ios" src="res/icons/ios/icon-small@2x.png" width="58"/>
+    <icon height="87" platform="ios" src="res/icons/ios/icon-small@3x.png" width="87"/>
+    <icon height="1024" platform="ios" src="res/icons/ios/icon-1024.png" width="1024"/>
+    <icon height="167" platform="ios" src="res/icons/ios/icon-83.5@2x.png" width="167"/>
+    <splash src="res/screens/ios/Default@2x~universal~anyany.png"/>
+    <splash height="480" src="res/screens/ios/Default~iphone.png" width="320"/>
+    <splash height="960" src="res/screens/ios/Default@2x~iphone.png" width="640"/>
+    <splash height="1136" src="res/screens/ios/Default-568h@2x~iphone.png" width="640"/>
+    <splash height="1334" src="res/screens/ios/Default-667h.png" width="750"/>
+    <splash height="2208" src="res/screens/ios/Default-736h.png" width="1242"/>
+    <splash height="1242" src="res/screens/ios/Default-Landscape-736h.png" width="2208"/>
+    <splash height="1024" src="res/screens/ios/Default-Portrait~ipad.png" width="768"/>
+    <splash height="768" src="res/screens/ios/Default-Landscape~ipad.png" width="1024"/>
+    <splash height="2048" src="res/screens/ios/Default-Portrait@2x~ipad.png" width="1536"/>
+    <splash height="1536" src="res/screens/ios/Default-Landscape@2x~ipad.png" width="2048"/>
+    <config-file parent="NSLocationAlwaysUsageDescription" platform="ios" target="*-Info.plist">
+      <string>This allows us to use your location to provide you a nearby restaurant, and to facilitate more accurately, keeping you in the loop about Karenderia.</string>
+    </config-file>
+    <config-file parent="NSLocationWhenInUseUsageDescription" platform="ios" target="*-Info.plist">
+      <string>This allows us to use your location to provide you a nearby restaurant, and to facilitate more accurately, keeping you in the loop about Karenderia.</string>
+    </config-file>
+    <preference name="orientation" value="portrait"/>
+    <edit-config file="*-Info.plist" mode="merge" target="NSCameraUsageDescription">
+      <string>Enable Karenderia to access your camera to take photos of you and to save as profile picture.</string>
+    </edit-config>
+    <edit-config file="*-Info.plist" mode="merge" target="NSPhotoLibraryUsageDescription">
+      <string>Enable Karenderia to access your photo library to get pictures from there.</string>
+    </edit-config>
+    <edit-config file="*-Info.plist" mode="merge" target="NSLocationWhenInUseUsageDescription">
+      <string>This allows us to use your location to find restaurant nearby.</string>
+    </edit-config>
+    <edit-config file="*-Info.plist" mode="merge" target="NSLocationAlwaysAndWhenInUseUsageDescription">
+      <string>This allows us to use your location to provide you a nearby restaurant, and to facilitate more accurately, keeping you in the loop about Karenderia.</string>
+    </edit-config>
+    <edit-config file="*-Info.plist" mode="merge" target="NSLocationAlwaysUsageDescription">
+      <string>This allows us to use your location to find restaurant nearby.</string>
+    </edit-config>
+    <edit-config file="*-Info.plist" mode="merge" target="NSPhotoLibraryAddUsageDescription">
+      <string>Enable Karenderia to access your photo library to save pictures there.</string>
+    </edit-config>
+    <edit-config file="*-Info.plist" mode="merge" target="NSMicrophoneUsageDescription">
+      <string>need microphone access to record sounds</string>
+    </edit-config>
+    <edit-config file="*-Info.plist" mode="merge" target="NSBluetoothAlwaysUsageDescription">
+      <string>Improve location accuracy when finding nearby restaurant</string>
+    </edit-config>
+    <edit-config file="*-Info.plist" mode="merge" target="NSBluetoothPeripheralUsageDescription">
+      <string>Improve location accuracy when finding nearby restaurant</string>
+    </edit-config>
+    <edit-config file="*-Info.plist" mode="merge" target="NSContactsUsageDescription">
+      <string>Need access to your contacts</string>
+    </edit-config>
+    <edit-config file="*-Info.plist" mode="merge" target="NSCalendarsUsageDescription">
+      <string>Need acces to calendar</string>
+    </edit-config>
+    <edit-config file="*-Info.plist" mode="merge" target="NSMotionUsageDescription">
+      <string>Improve location accuracy when finding nearby restaurant</string>
+    </edit-config>
+  </platform>
+  <preference name="WindowsStorePublisherName" value="My Name"/>
+  <preference name="WindowsStoreIdentityName" value="784321d4-bab8-3957-d0a2-426559520ecc"/>
+  <preference name="ios-XCBuildConfiguration-TARGETED_DEVICE_FAMILY" value="1"/>
+  <preference name="AutoHideSplashScreen" value="false"/>
+  <preference name="FadeSplashScreen" value="false"/>
+  <preference name="ShowSplashScreenSpinner" value="false"/>
+  <allow-intent href="tel:*"/>
+  <preference name="EnableViewportScale" value="false"/>
+  <access origin="*"/>
+  <access origin="tel:*"/>
+  <preference name="KeepRunning" value="true"/>
+  <preference name="monaca:AndroidIsPackageNameSeparate" value="false"/>
+  <preference name="DisallowOverscroll" value="true"/>
+  <preference name="Orientation" value="default"/>
+  <preference name="SplashScreenDelay" value="1000"/>
+  <preference name="Fullscreen" value="false"/>
+</widget>

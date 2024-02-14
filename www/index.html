@@ -1,0 +1,3861 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />  
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">  
+  <link rel="stylesheet" href="lib/onsen/css/onsenui.min.css" />
+  <link rel="stylesheet" href="lib/onsen/css/onsen-css-components.min.css" />    
+
+  <link rel="stylesheet" href="lib/raty/jquery.raty.css" />  
+  <link rel="stylesheet" href="lib/progress-circle.min.css" />
+  <link rel="stylesheet" href="css/app.css?ver=1.0" />
+  
+  <ons-if platform="ios">    
+    <style type="text/css">
+     #page_startup .dim_background{
+		background:none;		
+	 }
+     .page--kpage_pullhook ons-toolbar{	   	   
+	   height: 57px;
+	 }
+     .page--kpage_pullhook ons-back-button{	   
+	   top: 20px;
+     }
+    </style>
+  </ons-if>
+
+  <script src="lib/onsen/js/onsenui.min.js"></script>
+  <script src="lib/jquery-3.5.1.min.js"></script>  
+  <script type="text/javascript" src="cordova.js"></script>   
+    
+  <script src="lib/raty/jquery.raty.js"></script>
+  <script src="lib/jquery.validate.min.js"></script>
+  
+  
+  <!--START MAPBOX-->
+  <link rel="stylesheet" href="lib/leaflet/leaflet.css" type="text/css" />  
+  <script src="lib/leaflet/leaflet.js"></script>  
+  <!--END MAPBOX-->
+       
+  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&key=AIzaSyAViy7dscZKXI7qd3b4fcUDU8_9fo_oVxI"></script>
+  
+  <script src="lib/gmaps.js?version=1.0.0"></script>
+  <script src="lib/jquery.translate.js?version=1.0.0"></script>
+  <script src="lib/jquery.geocomplete.min.js"></script>  
+  
+  <script src="lib/imagesloaded.pkgd.min.js?version=1.0.0"></script>
+  
+  <script src="lib/snazzy-info-window/snazzy-info-window.min.js"></script>
+  <link rel="stylesheet" href="lib/snazzy-info-window/snazzy-info-window.min.css"> 
+
+  <link href="lib/skeleton.css" rel="stylesheet" type="text/css" />
+ 
+  <script src="lib/moment.min.js"></script>
+  <script src="lib/moment-timezone-with-data.min.js"></script>
+  
+  <script src="js/config.js?version=1.0.0"></script>
+  <script src="js/template.js?version=1.0.0"></script>  
+  <script src="js/app.js?version=1.0.0"></script>  
+  <script src="js/map-wrapper.js?version=1.0.0"></script>     
+  <script src="js/escpos.js?version=1.0.0"></script> 
+  <script src="js/bluetooth.js?version=1.0.0"></script>   
+</head>
+<body>
+
+
+<audio id="bell_notification">    
+  <source src="sounds/critical.mp3" type="audio/mpeg">  
+</audio>
+
+<audio id="neworder_notification">    
+  <source src="sounds/neworder.mp3" type="audio/mpeg">  
+</audio>
+
+<ons-modal id="default_loader" direction="up">
+  <div style="text-align: center">
+    <p>      
+      <ons-progress-circular indeterminate></ons-progress-circular>       
+    </p>
+  </div>
+</ons-modal>
+
+<ons-modal id="refresh_loader" direction="up" modifier="refresh_loader">
+  <div style="text-align: center; margin-top:20%;">
+    <p>      
+      <ons-progress-circular indeterminate></ons-progress-circular>       
+    </p>
+  </div>
+</ons-modal>
+
+<template id="dialog_no_connection.html">
+  <ons-dialog id="dialog_no_connection" modifier="dialog_small">
+    <ons-page id="dialog_no_connection" modifier="dialog_no_connection">            
+       <div class="to_center" style="margin-top:30px;">
+       <img src="images/kuala.png">
+       <h3 class="trn">Connection Error</h3>
+       <p class="trn">Please check your network connectivity</p>
+       </div>        
+    </ons-page>
+  </ons-dialog>
+</template>
+
+<ons-modal id="upload_loader" direction="up">
+  <div class="upload_inline_container">
+    <p class="upload_inline_loader">
+     <span class="trn">Uploading file</span> <span class="upload_percent">0%</span>
+    </p>	    
+  </div>
+</ons-modal>
+
+<ons-navigator swipeable id="onsenNavigator" page="page_settings.html"></ons-navigator>
+
+<template id="page_settings.html">
+  <ons-page id="page_settings" >  
+      
+  </ons-page>
+</template>
+
+<template id="page_login.html">
+  <ons-page id="page_login" modifier="login_screen" >  
+  
+     <div class="main_logo_wrap">
+      <img src="images/logo-k@2x.png" class="logo">
+      <h2>Админ Вайеда</h2>
+      <!-- <img src="images/merchantapp@2x.png" class="sub_logo"> -->
+     </div>          
+     
+    <form id="frm_login" class="frm_login" method="POST"> 
+	<ons-bottom-toolbar modifier="form_bottom is_center">
+	   <div class="field_label">
+	   <ons-input name="username" id="username" modifier="material underbar" placeholder="User name" required float></ons-input>
+	   </div>
+	   
+	   <div class="field_label field_with_icon">
+	   <ons-input type="password" name="password" id="password" modifier="material underbar"
+	    placeholder="Password" required float></ons-input>
+	    
+	    <ons-button modifier="quiet" onclick="changePasswordField();" >
+	       <ons-icon icon="md-eye"></ons-icon>
+	    </ons-button>
+	    
+	   </div>
+	   
+	   <div>
+	   <ons-button modifier="large material black_btn" style="background: #000000;" onclick="submitForm('.frm_login','appLogin')" >
+	   <span class="trn">Login</span>
+	   </ons-button>
+	   </div>
+	   
+	   <div class="only_forgot_pass_div">
+	   <ons-button modifier="quiet material material--flat" onclick="resetToPage('forgot_password.html','fade')">
+	   <span class="trn">Forgot password?</span>
+	   </ons-button>
+	   </div>
+	   
+	   <div class="both_forgot_and_signup_div">
+	   <ons-row>
+	      <ons-col vertical-align="center" width="50%" class="to_left" >
+	        <ons-button modifier="quiet material material--flat" onclick="loadSignupForm();" >
+		      <span class="trn">Create an account</span>
+		    </ons-button>
+	      </ons-col>
+	      
+	      <ons-col vertical-align="center" width="50%" class="to_right" >
+	        <ons-button modifier="quiet material material--flat" onclick="resetToPage('forgot_password.html','fade')">
+		      <span class="trn">Forgot password?</span>
+		    </ons-button>
+	      </ons-col>	      
+	   </ons-row>
+	   </div>
+	   
+	</ons-bottom-toolbar>
+	</form>
+     
+  </ons-page>
+</template>
+
+<template id="forgot_password.html">
+  <ons-page id="forgot_password" modifier="login_screen" >  
+  
+  <div class="main_logo_wrap">
+    <img src="images/logo-k@2x.png" class="logo">
+    <h3>Админ Вайеда</h3>
+    <img src="images/merchantapp@2x.png" class="sub_logo">
+  </div>          
+     
+  <form id="frm_forgotpass" class="frm_forgotpass" method="POST"> 
+	<ons-bottom-toolbar modifier="form_bottom_medium is_center">
+	
+	<div class="field_label">
+	  <ons-input name="email_address" id="email_address" modifier="material underbar" placeholder="Email" required float></ons-input>
+	</div>
+	
+	<div>
+     <ons-button modifier="large material black_btn" style="background: #000000;" onclick="submitForm('.frm_forgotpass','forgotPassword')" >
+     <span class="trn">Continue</span>
+     </ons-button>
+     </div>
+     
+     <div>
+	   <ons-button modifier="quiet material material--flat"   onclick="resetToPage('page_login.html','fade')">
+	   <span class="trn">Go to login</span>
+	   </ons-button>
+	 </div>
+     
+	
+    </ons-bottom-toolbar>
+  </form>	
+  
+</ons-page>
+</template>  
+
+
+<template id="forgot_change_pass.html">
+  <ons-page id="forgot_change_pass" modifier="login_screen" >  
+  
+  <div class="main_logo_wrap">
+    <img src="images/logo-k@2x.png" class="logo">
+    <h3>Админ Вайеда</h3>
+    <img src="images/merchantapp@2x.png" class="sub_logo">
+  </div>          
+     
+  <form id="frm_change_pass" class="frm_change_pass" method="POST"> 
+    <input type="hidden" name="email_address" id="email_address" class="email_address">
+	<ons-bottom-toolbar modifier="form_bottom_large is_center">
+	
+	<div class="field_label">
+	  <ons-input name="code" id="code" modifier="material underbar" placeholder="Code" required float></ons-input>
+	</div>
+	
+		
+	<div class="field_label field_with_icon">
+	<ons-input type="password" name="new_password" id="new_password" modifier="material underbar" 
+	placeholder="New password" maxlength="20" required float></ons-input>
+	
+	<ons-button modifier="quiet" onclick="changePassField( $(this) );" >
+	  <ons-icon icon="md-eye"></ons-icon>
+	</ons-button>
+	
+	</div>
+		
+		
+	<div class="field_label field_with_icon">
+	<ons-input type="password" name="confirm_password" id="confirm_password" modifier="material underbar" 
+	placeholder="Confirm password" maxlength="20" required float></ons-input>
+	
+	<ons-button modifier="quiet" onclick="changePassField( $(this) );" >
+	  <ons-icon icon="md-eye"></ons-icon>
+	</ons-button>
+	
+	</div>
+	
+	<div>
+     <ons-button modifier="large material black_btn" onclick="submitForm('.frm_change_pass','ChangeForgotPassword')" >
+     <span class="trn">Change password</span>
+     </ons-button>
+     </div>
+     
+     <div>
+	   <ons-button modifier="quiet material material--flat" onclick="resetToPage('page_login.html','fade')">
+	   <span class="trn">Go to login</span>
+	   </ons-button>
+	 </div>
+     
+	
+    </ons-bottom-toolbar>
+  </form>	
+  
+</ons-page>
+</template>  
+
+
+<template id="homepage.html">
+  <ons-page id="homepage"  >  
+  
+  <input type="hidden" name="refresh_incoming_tab" class="refresh_incoming_tab" value="">
+  <input type="hidden" name="refresh_ready_tab" class="refresh_ready_tab" value="">
+  
+    <div class="top_sections">	
+	</div>
+	
+	
+	<ons-tabbar position="bottom" modifier="ktabbar_bottom"  animation-options="{duration: 0.1, delay: 1, timing: 'ease-in'}" >
+	
+	   <ons-tab page="dashboard.html">
+		  <input type="radio" style="display: none" />
+		  <button class="tabbar__button tabbar--tab_left__button">	    		  
+		  <div class="tabbar__badge notification new_cancel_order_badge pulse"></div>
+		    <div class="tabbar__label">		    
+		      <div class="rounded_checked"><img src="images/home@2x.png" > <span class="trn">Home</span></div>
+		    </div>	    
+		  </button>
+		</ons-tab>
+		
+		<ons-tab page="order.html">
+		  <input type="radio" style="display: none" />
+		  <button class="tabbar__button tabbar--tab_right__button">	    
+		   <div class="tabbar__badge notification new_order_badge pulse"></div>
+		    <div class="tabbar__label">
+		      <div class="rounded_checked"><img src="images/orders@2x.png" > <span class="trn">Orders</span></div>
+		    </div>	    		    
+		  </button>
+		</ons-tab>
+		
+		<ons-tab page="table.html" class="tabbar_table">
+		  <input type="radio" style="display: none" />
+		  <button class="tabbar__button tabbar--tab_left__button">	  
+		     <div class="tabbar__badge notification new_booking_badge pulse"></div>  
+		    <div class="tabbar__label">		    
+		    <div class="rounded_checked"><img src="images/table@2x.png" > <span class="trn">Table</span></div>
+		    </div>	    
+		  </button>
+		</ons-tab>
+		
+		<ons-tab page="push_list.html">
+		  <input type="radio" style="display: none">
+		  <button class="tabbar__button tabbar--tab_left__button">	   
+		    <div class="tabbar__badge notification new_push_message pulse"></div>   
+		    <div class="tabbar__label">		    
+		    <div class="rounded_checked"><img src="images/chat@2x.png" > <span class="trn">Notification</span></div>
+		    </div>	    
+		  </button>
+		</ons-tab>
+		
+		<ons-tab page="profile.html">
+		  <input type="radio" style="display: none">
+		  <button class="tabbar__button tabbar--tab_left__button">	    
+		    <div class="tabbar__label">		    
+		    <div class="rounded_checked"><img src="images/profile@2x.png" style="max-width:30px;" >
+		     <span class="trn">Profile</span></div>
+		    </div>	    
+		  </button>
+		</ons-tab>
+	
+	</ons-tabbar>	
+	
+  
+  </ons-page>
+</template>  
+
+
+<template id="dashboard.html">
+  <ons-page id="dashboard" modifier="kform_page khome_page" >  
+  
+  <div class="menu"></div>
+  
+  </ons-page>
+</template>    
+
+<template id="test_page.html">
+  <ons-page id="test_page" modifier="" >    
+   test_page  
+</ons-page>
+</template>    
+
+
+<!--ORDER -->
+<template id="order.html">
+  <ons-page id="order" modifier="" >  
+  
+   <ons-tabbar position="top" modifier="top-border ktabbar_top"
+      animation-options="{duration: 0.1, delay: 1, timing: 'ease-in'}" >
+	
+	   <ons-tab page="todays_order.html">
+		  <input type="radio" style="display: none" />
+		  <button class="tabbar__button tabbar--tab_left__button">	    
+		    <div class="tabbar__label">		    		      
+		      <div class="rounded_checked"><img src="images/todays-order@2x.png" > 
+		      <span class="trn">Incoming</span> <span class="incoming_count">0</span></div>
+		    </div>	    
+		  </button>
+		</ons-tab>
+		
+		<ons-tab page="outgoing_order.html">
+		  <input type="radio" style="display: none" />
+		  <button class="tabbar__button tabbar--tab_right__button">	     
+		    <div class="tabbar__label">		    
+		      <div class="rounded_checked"><!--<img src="images/past-order@2x.png" >--> 
+		      <span class="trn">Outgoing</span> <span class="outgoing_count">0</span></div>
+		    </div>	    
+		  </button>
+		</ons-tab>
+		
+		<ons-tab page="ready_order.html">
+		  <input type="radio" style="display: none" />
+		  <button class="tabbar__button tabbar--tab_right__button">	     
+		    <div class="tabbar__label">		    
+		      <div class="rounded_checked">
+		      <span class="trn">Ready</span> <span class="ready_count">0</span></div>
+		    </div>	    
+		  </button>
+		</ons-tab>
+		
+  </ons-tabbar>			
+  
+</ons-page>
+</template>    
+
+<template id="all_orders.html">
+  <ons-page id="all_orders" modifier="kform_page kpage_pullhook" >  
+  
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+  <div class="top_sections">	
+	 <div class="to_center">
+	 <h3 class="trn">Orders</h3>
+	 <div class="rounded_tag trn">All Orders</div>
+	 </div>
+  </div>
+    
+  <input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+  <input type="hidden" name="list_action" class="list_action" value="order_list"> 
+	
+	<form id="frm_search_all_order" class="frm_search_all_order" method="POST" onsubmit="return false;"> 
+	<div class="field_label field_with_icon">
+	
+	<input type="hidden" name="page_id" class="page_id" value="all_orders"> 
+	<input type="hidden" name="order_type" class="order_type" value="all"> 	
+	
+	<ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	placeholder="Search for order no. or name" required float></ons-input>
+	<ons-button modifier="quiet" onclick="submitForm('.frm_search_all_order','order_list')" >
+	<ons-icon icon="md-search"></ons-icon>
+	</ons-button>
+	</div>
+	</form>		
+  
+  <ons-list modifier="order_list">    
+  </ons-list>  
+  
+  <div class="no_list"></div>
+  
+   <div  class="paginate_loader">
+	  <ons-progress-circular indeterminate></ons-progress-circular> 	  
+   </div>
+	
+   <div class="spacer"></div>
+  
+</ons-page>
+</template>  
+
+<template id="cancel_orders.html">
+  <ons-page id="cancel_orders" modifier="kform_page kpage_pullhook" >  
+  
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+  <div class="top_sections">	
+	 <div class="to_center">
+	 <h3 class="trn">Cancel</h3>
+	 <div class="rounded_tag trn">order</div>
+	 </div>
+  </div>
+    
+  <input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+  <input type="hidden" name="list_action" class="list_action" value="order_list"> 
+	
+	<form id="frm_search_cancel_orders" class="frm_search_cancel_orders" method="POST" onsubmit="return false;" > 
+	<div class="field_label field_with_icon">
+	
+	<input type="hidden" name="page_id" class="page_id" value="cancel_orders"> 
+	<input type="hidden" name="order_type" class="order_type" value="all"> 	
+	
+	<ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	placeholder="Search for order no. or name" required float></ons-input>
+	<ons-button modifier="quiet" onclick="submitForm('.frm_search_cancel_orders','order_list')" >
+	<ons-icon icon="md-search"></ons-icon>
+	</ons-button>
+	</div>
+	</form>		
+  
+  <ons-list modifier="order_list">    
+  </ons-list>  
+  
+  <div class="no_list"></div>
+  
+   <div  class="paginate_loader">
+	  <ons-progress-circular indeterminate></ons-progress-circular> 	  
+   </div>
+	
+   <div class="spacer"></div>
+  
+</ons-page>
+</template>  
+
+<template id="todays_order.html">
+  <ons-page id="todays_order" modifier="" >  
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+  
+  <input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+  <input type="hidden" name="list_action" class="list_action" value="order_list"> 
+  
+  <ons-list modifier="order_list">    
+  </ons-list>  
+  
+  <div class="no_list"></div>
+  
+   <div  class="paginate_loader">
+	  <ons-progress-circular indeterminate></ons-progress-circular> 	  
+   </div>
+	
+   <div class="spacer"></div>
+  
+</ons-page>
+</template>    
+
+<template id="outgoing_order.html">
+  <ons-page id="outgoing_order" modifier="" >  
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook> 
+  
+  <input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+  <input type="hidden" name="list_action" class="list_action" value="order_list"> 
+  
+  <ons-list modifier="order_list">    
+  </ons-list>  
+  
+  <div class="no_list"></div>
+  
+   <div  class="paginate_loader">
+	  <ons-progress-circular indeterminate></ons-progress-circular> 	  
+   </div>
+	
+   <div class="spacer"></div>
+  
+</ons-page>
+</template>    
+
+<template id="ready_order.html">
+  <ons-page id="ready_order" modifier="" >  
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook> 
+  
+  <input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+  <input type="hidden" name="list_action" class="list_action" value="order_list"> 
+  
+  <ons-list modifier="order_list">    
+  </ons-list>  
+  
+  <div class="no_list"></div>
+  
+   <div  class="paginate_loader">
+	  <ons-progress-circular indeterminate></ons-progress-circular> 	  
+   </div>
+	
+   <div class="spacer"></div>
+  
+</ons-page>
+</template>    
+
+<template id="accept_order.html">
+  <ons-dialog id="accept_order" cancelable modifier="dialog_medium">
+    <div class="content_inner">
+    
+       <ons-button modifier="quiet button_close" onclick="CloseDialog('accept_order')" >	      
+	      <ons-icon icon="md-close"></ons-icon>
+	    </ons-button>
+    
+      <p class="transtype toupper"></p> 
+                 
+      <form id="frm_accept" class="frm_accept" method="POST" onsubmit="return false;"> 	
+      <input type="hidden" name="order_id" id="order_id" class="order_id" value="0">     
+      <input type="hidden" name="reason" id="reason" class="reason" value="">  
+      <div class="segment"></div>           
+      
+      <div>
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_accept','AcceptOrder')" >	   
+	   <span class="trn">CONFIRM</span>
+	   </ons-button>
+	  </div>	   	  	   
+	  
+      </form>       
+                
+    </div>
+  </ons-dialog>
+</template>
+
+
+<template id="order_options.html">
+  <ons-dialog id="order_options" cancelable modifier="dialog_large">
+    <div class="content_inner">
+    
+        <ons-button modifier="quiet button_close" onclick="CloseDialog('order_options')" >
+	      <ons-icon icon="md-close"></ons-icon>
+	    </ons-button>
+	    
+      <p class="transtype toupper"></p> 
+      <p class="sub_reason"></p>
+                 
+      <form id="frm_order_options" class="frm_order_options" method="POST" onsubmit="return false;"> 	
+      <input type="hidden" name="order_id" id="order_id" class="order_id" value="0">      
+      <input type="hidden" name="reason" id="reason" class="reason" value=""> 
+      <input type="hidden" name="cancel_action" id="cancel_action" class="cancel_action" value=""> 
+      
+      <div class="segment">       
+      </div>        
+      
+      <div class="field_label">
+        <textarea id="notes" name="notes" class="textarea textarea--transparent notes" rows="2" 
+         placeholder="Additional comments"></textarea>
+      </div>
+      
+               
+      <div >
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_order_options','OrderOptions')" >	   
+	   <span class="trn">CONFIRM</span>
+	   </ons-button>
+	  </div>	   	  	   
+      </form>       
+                
+    </div>
+  </ons-dialog>
+</template>
+
+<template id="order_details.html">
+  <ons-page id="order_details" modifier="kform_page kpage_pullhook" >  
+
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+  <div class="top_sections">	
+     <div class="to_center">
+     <h3></h3>
+     <div class="sub_title rounded_tag"></div>
+     </div>
+  </div>
+  
+  <ons-list modifier="order_list">
+  </ons-list>  
+  
+  <div class="spacer2"></div> 
+  
+</ons-page>
+</template>    
+
+
+<!--END ORDER -->
+
+<template id="table.html">
+  <ons-page id="table" modifier="" >  
+
+  <ons-tabbar position="top" modifier="top-border ktabbar_top"
+      animation-options="{duration: 0.1, delay: 1, timing: 'ease-in'}" >
+	
+	   <ons-tab page="todays_booking.html">
+		  <input type="radio" style="display: none" />
+		  <button class="tabbar__button tabbar--tab_left__button">	    
+		    <div class="tabbar__label">		    		      
+		      <div class="rounded_checked">
+		      <img src="images/todays-order@2x.png" > 		      
+		      <span class="trn">Incoming</span> <span class="booking_incoming_count">0</span></div>
+		      </div>
+		    </div>	    
+		  </button>
+		</ons-tab>
+		
+		<ons-tab page="cancel_booking.html">
+		  <input type="radio" style="display: none" />
+		  <button class="tabbar__button tabbar--tab_right__button">	     
+		    <div class="tabbar__label">		    		      
+		      <span class="trn">New cancel</span> <span class="booking_cancel_count">0</span></div>
+		      </div>
+		    </div>	    
+		  </button>
+		</ons-tab>
+		
+		<ons-tab page="past_booking.html">
+		  <input type="radio" style="display: none" />
+		  <button class="tabbar__button tabbar--tab_right__button">	     
+		    <div class="tabbar__label">		    		      	     
+		      <span class="trn">Done</span> <span class="booking_total_count">0</span></div>
+		      </div>
+		    </div>	    
+		  </button>
+		</ons-tab>
+		
+  </ons-tabbar>			
+  
+  </ons-page>
+</template>    
+
+<!--BOOKING-->
+<template id="all_booking.html">
+  <ons-page id="all_booking" modifier="kform_page kpage_pullhook" >  
+  
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+  <div class="top_sections">	
+	 <div class="to_center">
+	 <h3 class="trn">Booking table</h3>
+	 <div class="rounded_tag trn">All Booking</div>
+	 </div>
+  </div>
+    
+  <input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+  <input type="hidden" name="list_action" class="list_action" value="order_list"> 
+	
+	<form id="frm_search_all_booking" class="frm_search_all_booking" method="POST" onsubmit="return false;" > 
+	<div class="field_label field_with_icon">
+	
+	<input type="hidden" name="page_id" class="page_id" value="all_booking"> 
+	<input type="hidden" name="order_type" class="order_type" value="all"> 	
+	
+	<ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	placeholder="Search for booking no. or name" required float></ons-input>
+	<ons-button modifier="quiet" onclick="submitForm('.frm_search_all_booking','booking_list')" >	
+	<ons-icon icon="md-search"></ons-icon>
+	</ons-button>
+	</div>
+	</form>		
+  
+  <ons-list modifier="order_list">    
+  </ons-list>  
+  
+  <div class="no_list"></div>
+  
+   <div  class="paginate_loader">
+	  <ons-progress-circular indeterminate></ons-progress-circular> 	  
+   </div>
+	
+   <div class="spacer"></div>
+   
+    <ons-fab position="bottom left" modifier="material mini" onclick="showPage('booking_settings.html');">
+     <ons-icon icon="md-settings"></ons-icon>
+   </ons-fab>
+  
+</ons-page>
+</template>  
+
+
+<template id="todays_booking.html">
+  <ons-page id="todays_booking" modifier="" >  
+
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+   <input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+  <input type="hidden" name="list_action" class="list_action" value="order_list"> 
+  
+  <ons-list modifier="order_list">    
+  </ons-list>
+  
+  <div class="no_list"></div>
+  
+   <div  class="paginate_loader">
+	  <ons-progress-circular indeterminate></ons-progress-circular> 	  
+   </div>
+	
+   <div class="spacer"></div>
+  
+  </ons-page>
+</template>  
+
+<template id="cancel_booking.html">
+  <ons-page id="cancel_booking" modifier="" >  
+
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+  <input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+  <input type="hidden" name="list_action" class="list_action" value="order_list"> 
+  
+  <ons-list modifier="order_list">    
+  </ons-list>
+  
+  <div class="no_list"></div>
+  
+   <div  class="paginate_loader">
+	  <ons-progress-circular indeterminate></ons-progress-circular> 	  
+   </div>
+	
+   <div class="spacer"></div> 
+  
+  </ons-page>
+</template>    
+
+<template id="past_booking.html">
+  <ons-page id="past_booking" modifier="" >  
+
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+  <input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+  <input type="hidden" name="list_action" class="list_action" value="order_list"> 
+  
+  <ons-list modifier="order_list">    
+  </ons-list>
+  
+  <div class="no_list"></div>
+  
+   <div  class="paginate_loader">
+	  <ons-progress-circular indeterminate></ons-progress-circular> 	  
+   </div>
+	
+   <div class="spacer"></div> 
+  
+  </ons-page>
+</template>    
+
+
+<template id="booking_options.html">
+  <ons-dialog id="booking_options" cancelable modifier="">
+    <div class="content_inner">
+    
+        <ons-button modifier="quiet button_close" onclick="CloseDialog('booking_options')" >
+	      <ons-icon icon="md-close"></ons-icon>
+	    </ons-button>
+	    
+      <p class="booking_number toupper"></p> 
+      <p class="sub_reason"></p>
+                 
+      <form id="frm_booking_options" class="frm_booking_options" method="POST" onsubmit="return false;"> 	
+      <input type="hidden" name="booking_id" id="booking_id" class="booking_id" value="0">            
+      <input type="hidden" name="reason" id="reason" class="reason" value="">  
+      <input type="hidden" name="cancel_action" id="cancel_action" class="cancel_action" value=""> 
+      
+      <div class="segment">       
+      </div>        
+      
+      <div class="field_label">
+        <textarea id="notes" name="notes" class="textarea textarea--transparent notes" rows="2" 
+         placeholder="Additional comments"></textarea>
+      </div>
+      
+               
+      <div >
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_booking_options','BookingOptions')" >
+	   <span class="trn">CONFIRM</span>
+	   </ons-button>
+	  </div>	   	  	   
+      </form>       
+                
+    </div>
+  </ons-dialog>
+</template>
+
+
+
+<template id="booking_details.html">
+  <ons-page id="booking_details" modifier="kform_page kpage_pullhook" >  
+
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+  <div class="top_sections">	
+     <div class="to_center">
+     <h3></h3>
+     <div class="sub_title rounded_tag"></div>
+     </div>
+  </div>
+  
+  <ons-list modifier="order_list">
+  </ons-list>  
+  
+  <div class="spacer2"></div> 
+  
+</ons-page>
+</template>    
+
+
+<!--END BOOKING-->
+
+<template id="push_list.html">
+  <ons-page id="push_list" modifier="" >  
+
+    
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+  <div class="top_options">
+  <ons-row>
+   <ons-col vertical-align="top" width="85%"   >
+   <form id="frm_search_push_list" class="frm_search_push_list" method="POST"> 
+	<div class="field_label field_with_icon">
+	
+	<input type="hidden" name="page_id" class="page_id" value="push_list"> 
+	<input type="hidden" name="list_type" class="list_type" value="unread"> 	
+	
+	<ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	placeholder="Search" required float></ons-input>
+	<ons-button modifier="quiet" onclick="submitForm('.frm_search_push_list','notificationList')" >
+	<ons-icon icon="md-search"></ons-icon>
+	</ons-button>
+	</div>
+	</form>
+	</ons-col>
+	
+	<ons-col vertical-align="top" width="15%"  class="to_right" >
+	
+	  <ons-button modifier="quiet white_btn" onclick="notificationAction();">
+	     <ons-icon icon="md-more-vert"></ons-icon>
+	   </ons-button>  
+	
+	</ons-col>
+	
+  </ons-row>			
+  </div>
+	  
+  <input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+  <input type="hidden" name="list_action" class="list_action" value="push_list"> 
+  
+  
+  <ons-list modifier="order_list">       
+  </ons-list>  
+  
+  <div class="no_list"></div>
+  
+   <div  class="paginate_loader">
+	  <ons-progress-circular indeterminate></ons-progress-circular> 	  
+   </div>
+	
+   <div class="spacer"></div>
+  
+  </ons-page>
+</template>    
+
+<template id="profile.html">
+  <ons-page id="profile" modifier="" >  
+
+  <ons-tabbar position="top" modifier="top-border ktabbar_top"
+      animation-options="{duration: 0.1, delay: 1, timing: 'ease-in'}" >
+	
+	   <ons-tab page="profile_data.html">
+		  <input type="radio" style="display: none" />
+		  <button class="tabbar__button tabbar--tab_left__button">	    
+		    <div class="tabbar__label">		    		      
+		      <div class="rounded_checked"><img src="images/profile@2x.png" > <span class="trn">Profile data</span></div>
+		    </div>	    
+		  </button>
+		</ons-tab>
+		
+		<ons-tab page="settings.html">
+		  <input type="radio" style="display: none" />
+		  <button class="tabbar__button tabbar--tab_right__button">	     
+		    <div class="tabbar__label">		    
+		      <div class="rounded_checked"><img src="images/list@2x.png" > <span class="trn">Settings</span></div>
+		    </div>	    
+		  </button>
+		</ons-tab>
+		
+  </ons-tabbar>			
+  
+  </ons-page>
+</template>    
+
+<template id="profile_data.html">
+  <ons-page id="profile_data" modifier="kform_page" >    
+  
+    <form id="frm_profile" class="frm_profile" method="POST"> 	
+    
+	   <div class="field_label">
+	   <ons-input name="username" id="username" 
+	   class="username"
+	   modifier="material underbar" placeholder="Username" required float></ons-input>
+	   </div>
+	   
+	   <div class="field_label">
+	   <ons-input name="mobile_number" id="mobile_number" 
+	   class="mobile_number"
+	   modifier="material underbar" placeholder="Mobile number" required float></ons-input>
+	   </div>
+	   
+	   <div class="field_label">
+	   <ons-input name="email_address" id="email_address"
+	   class="email_address"
+	    modifier="material underbar" placeholder="Email" required float></ons-input>
+	   </div>
+	   
+	   
+	   <div>
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_profile','saveProfile')" >	   
+	   <span class="trn">Save changes</span>
+	   </ons-button>
+	   </div>	   	  
+	   
+	   <div class="spacer2"></div>
+	   
+	   <div class="to_center">
+	   <ons-button modifier="quiet material material--flat" onclick="logout();">
+	   <span class="trn">Logout</span>
+	   </ons-button>
+	   </div>
+	   
+	</form> 
+  
+</ons-page>
+</template>    
+
+<template id="settings.html">
+  <ons-page id="settings" modifier="" >    
+  
+   <ons-list modifier="klist">
+    <ons-list-header><span class="trn">You</span></ons-list-header>
+    <ons-list-item tappable modifier="chevron" onclick="showPage('change_password.html','lift')">
+     <span class="trn">Change password</span>
+    </ons-list-item>
+    <ons-list-item tappable modifier="chevron" onclick="getPin()" >
+     <span class="trn">Set Pin</span>
+    </ons-list-item>
+    <ons-list-item tappable modifier="chevron" onclick="showPage('language.html','lift')" >
+     <span class="trn">Language</span>
+    </ons-list-item>    
+    
+    <ons-list-header>
+     <span class="trn">About</span>
+    </ons-list-header>
+    <ons-list-item tappable>
+       <div class="left trn">App version</div>
+       <div class="right app_version"></div>
+    </ons-list-item>    
+    <ons-list-item tappable modifier="chevron" onclick="showPage('device_info.html','lift')" >
+     <span class="trn">Device information</span>
+    </ons-list-item>    
+        
+    <ons-list-item tappable modifier="chevron" onclick="openPrivacyPolicy();" >    
+    <span class="trn">Privacy policy</span>    
+    </ons-list-item>       
+    
+    <ons-list-header>
+     <span class="trn">Display</span>
+    </ons-list-header>
+    
+    <ons-list-item>
+      <div class="center">
+        <span class="trn">Keep the app awake</span>
+      </div>
+      <div class="right">
+        <ons-switch name="keep_app_awake" class="keep_app_awake" value="1" 
+        modifier="material" onclick="KeepAwake();" ></ons-switch>
+      </div>
+    </ons-list-item>
+    
+    <ons-list-header>
+     <span class="trn">Push notification</span>
+    </ons-list-header>
+    
+    <ons-list-item>
+      <div class="center">
+        <span class="trn">New order</span>
+      </div>
+      <div class="right">
+        <ons-switch name="push_enabled" class="push_enabled" value="1" 
+        modifier="material" onclick="EnabledPush();" ></ons-switch>
+      </div>
+    </ons-list-item>
+    
+    <ons-list-item>
+      <div class="center">
+        <span class="trn">Receive alerts</span>
+      </div>
+      <div class="right">
+        <ons-switch name="push_alert" class="push_alert"
+        value="1" 
+         modifier="material" onclick="EnabledSubcribe()"></ons-switch>
+      </div>
+    </ons-list-item>
+    
+    <ons-list-header>
+     <span class="trn">Printers</span>
+    </ons-list-header>
+    
+    <!--<ons-list-item tappable modifier="chevron" onclick="showPage('printer_list.html','lift')" >-->
+    <ons-list-item tappable modifier="chevron" onclick="checkAccessFineLocation('access_fine_location_permission.html','printer_list.html');" >
+     <span class="trn">Settings</span>
+    </ons-list-item>    
+    
+    <ons-list-item ></ons-list-item>
+    
+  </ons-list>
+  
+</ons-page>
+</template>    
+
+
+<template id="change_password.html">
+  <ons-page id="change_password" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Settings</h3>
+	     <div class="rounded_tag trn">Change password</div>
+	     </div>
+	</div>
+  
+	  <form id="frm_changepassword" class="frm_changepassword" method="POST"> 	
+	  
+	   <div class="field_label field_with_icon">
+	   <ons-input type="password" name="old_password" id="old_password" modifier="material underbar"
+	    placeholder="Old password" required float></ons-input>
+	    	    
+		<ons-button modifier="quiet" onclick="changePassField( $(this) );" >
+		  <ons-icon icon="md-eye"></ons-icon>
+		</ons-button>
+
+	   </div>
+	   
+	   <div class="field_label field_with_icon">
+	   <ons-input type="password" name="new_password" id="new_password" modifier="material underbar"
+	    placeholder="New password" required float></ons-input>
+	    
+	    <ons-button modifier="quiet" onclick="changePassField( $(this) );" >
+		  <ons-icon icon="md-eye"></ons-icon>
+		</ons-button>
+	    
+	   </div>
+	   
+	   <div class="field_label field_with_icon">
+	   <ons-input type="password" name="repeat_password" id="repeat_password" modifier="material underbar"
+	    placeholder="Repeat password" required float></ons-input>
+	    
+	    <ons-button modifier="quiet" onclick="changePassField( $(this) );" >
+		  <ons-icon icon="md-eye"></ons-icon>
+		</ons-button>
+	   </div>
+	   
+	   <ons-bottom-toolbar modifier="form_bottom_small is_center">	
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_changepassword','changePassword')" >	   
+	   <span class="trn">Save password</span>
+	   </ons-button>
+	   </ons-bottom-toolbar>
+	</form> 
+	
+  </ons-page>
+</template>    
+
+<template id="set_pin.html">
+  <ons-page id="set_pin" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Settings</h3>
+	     <div class="rounded_tag trn">Set Pin</div>
+	     </div>
+	</div>
+  
+	  <form id="frm_setpin" class="frm_setpin" method="POST"> 	
+	   	   
+	  <ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_setpin','setPin')" >	   
+	   <span class="trn">Save PIN</span>
+	   </ons-button>	   
+	  </ons-bottom-toolbar>
+	</form> 
+	
+  </ons-page>
+</template>    
+
+
+<template id="remove_pin.html">
+  <ons-page id="remove_pin" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Settings</h3>
+	     <div class="rounded_tag trn">Set Pin</div>
+	     </div>
+	</div>
+  
+	<form id="frm_remove_pin" class="frm_remove_pin" method="POST"> 	
+		 
+	<div class="spacer2"></div>
+	
+	<div class="pin_show">	 
+	</div>
+	
+	<div class="spacer2"></div>
+	
+	<ons-button modifier="material large black_btn" onclick="submitForm('.frm_remove_pin','removePin')" >	   
+	   <span class="trn">REMOVE PIN</span>
+	</ons-button>	   
+	</form> 
+	
+	<div class="spacer2"></div>
+	
+	<div class="to_center">
+	   <ons-button modifier="quiet material material--flat" onclick="replacePage('set_pin.html','')">
+	   <span class="trn">Change PIN</span>
+	   </ons-button>
+	</div>
+	
+  </ons-page>
+</template>    
+
+<template id="language.html">
+  <ons-page id="language" modifier="kform_page kpage_pullhook" >  
+
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Settings</h3>
+	     <div class="rounded_tag trn">Languages</div>
+	     </div>
+	</div>
+  
+	<ons-list modifier="klist">    
+    </ons-list>
+    
+    <div class="no_list"></div>
+	
+  </ons-page>
+</template>    
+
+<template id="device_info.html">
+  <ons-page id="device_info" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections" >	
+         <div class="to_center">
+         <h3 class="trn">Settings</h3>
+	     <div class="rounded_tag trn">Device information</div>
+	     </div>
+	</div>
+	
+	<ons-list modifier="klist">    
+    </ons-list>
+	
+</ons-page>
+</template>    
+	
+
+<template id="info.html">
+  <ons-page id="info" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Info</h3>
+	     <div class="rounded_tag trn">Merchant information</div>
+	     </div>
+	</div>
+	
+	<form id="frm_info" class="frm_info" method="POST"> 		  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_info','updateMerchantInfo')" >
+	   <span class="trn">Save changes</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+	
+
+<template id="category.html">
+  <ons-page id="category" modifier="kform_page kpage_pullhook" >  
+      
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Food</h3>
+	     <div class="sub_title rounded_tag trn">Category</div>
+	     </div>
+	</div>
+	
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="getCategoryList"> 
+	<input type="hidden" name="delete_action" class="delete_action" value="CategoryDelete"> 
+	<input type="hidden" name="get_action" class="get_action" value="CategoryGetByID">
+    
+	<form id="frm_search_category" class="frm_search_category" method="POST" onsubmit="return false;" > 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required float></ons-input>
+	    <ons-button modifier="quiet" onclick="submitForm('.frm_search_category','getCategoryList')" >	    
+	    <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+    
+    <ons-fab position="bottom right" modifier="material mini" onclick="showPage('category_form.html');">
+     <ons-icon icon="md-plus"></ons-icon>
+    </ons-fab>
+
+</ons-page>
+</template>    
+
+<template id="category_form.html">
+  <ons-page id="category_form" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Food</h3>
+	     <div class="sub_title trn">Category</div>
+	     </div>
+	</div>
+	
+	<form id="frm_category" class="frm_category" method="POST" onsubmit="return false"> 		  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_category','AddCategory')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+
+
+<template id="addon_list.html">
+  <ons-page id="addon_list" modifier="kform_page kpage_pullhook" >  
+      
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Food</h3>
+	     <div class="sub_title rounded_tag trn">Addon category</div>
+	     </div>
+	</div>
+	
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="getAddonList"> 
+	<input type="hidden" name="delete_action" class="delete_action" value="AddonDelete"> 
+	<input type="hidden" name="get_action" class="get_action" value="AddonGetByID">
+    
+	<form id="frm_search_addon_list" class="frm_search_addon_list" method="POST" onsubmit="return false;" > 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required float></ons-input>
+	    <ons-button modifier="quiet" onclick="submitForm('.frm_search_addon_list','getAddonList')" >
+	    <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+    
+    <ons-fab position="bottom right" modifier="material mini" onclick="showPage('addon_form.html');">
+     <ons-icon icon="md-plus"></ons-icon>
+    </ons-fab>
+
+</ons-page>
+</template>    
+
+
+<template id="addon_form.html">
+  <ons-page id="addon_form" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Food</h3>
+	     <div class="sub_title trn">Addon category</div>
+	     </div>
+	</div>
+		
+	<form id="frm_addon" class="frm_addon" method="POST" onsubmit="return false" > 
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_addon','AddAddon')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+
+
+<template id="addon_item_list.html">
+  <ons-page id="addon_item_list" modifier="kform_page kpage_pullhook" >  
+      
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Food</h3>
+	     <div class="sub_title rounded_tag trn">Addon item</div>
+	     </div>
+	</div>
+	
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="getAddonItemList"> 
+	<input type="hidden" name="delete_action" class="delete_action" value="AddonItemDelete"> 
+	<input type="hidden" name="get_action" class="get_action" value="AddonItemGetByID">
+    
+	<form id="frm_search_addon_item_list" class="frm_search_addon_item_list" method="POST" onsubmit="return false;" > 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required float></ons-input>
+	    <ons-button modifier="quiet" onclick="submitForm('.frm_search_addon_item_list','getAddonItemList')" >
+	      <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+    
+    <ons-fab position="bottom right" modifier="material mini" onclick="showPage('addon_item_form.html');">
+     <ons-icon icon="md-plus"></ons-icon>
+    </ons-fab>
+
+</ons-page>
+</template>    
+
+
+<template id="addon_item_form.html">
+  <ons-page id="addon_item_form" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Food</h3>
+	     <div class="sub_title trn">Addon item</div>
+	     </div>
+	</div>
+		
+	<form id="frm_addon_item" class="frm_addon_item" method="POST" onsubmit="return false" > 	  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_addon_item','AddAddonItem')" >
+	   SAVE
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+
+
+<!--INGREDIENTS-->
+<template id="ingredients_list.html">
+  <ons-page id="ingredients_list" modifier="kform_page kpage_pullhook" >  
+      
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Food</h3>
+	     <div class="sub_title rounded_tag trn">Ingredients</div>
+	     </div>
+	</div>
+	
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="IngredientsList"> 
+	<input type="hidden" name="delete_action" class="delete_action" value="IngredientsDelete"> 
+	<input type="hidden" name="get_action" class="get_action" value="IngredientsGetByID">
+    
+	<form id="frm_search_ingredients" class="frm_search_ingredients" method="POST" onsubmit="return false;" > 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required float></ons-input>
+	    <ons-button modifier="quiet" onclick="submitForm('.frm_search_ingredients','IngredientsList')" >
+	      <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+    
+    <ons-fab position="bottom right" modifier="material mini" onclick="showPage('ingredients_form.html');">
+     <ons-icon icon="md-plus"></ons-icon>
+    </ons-fab>
+
+</ons-page>
+</template>    
+
+
+<template id="ingredients_form.html">
+  <ons-page id="ingredients_form" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Food</h3>
+	     <div class="sub_title trn">Ingredients</div>
+	     </div>
+	</div>
+		
+	<form id="frm_ingredients" class="frm_ingredients" method="POST" onsubmit="return false" > 	  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_ingredients','AddIngredients')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+<!--END INGREDIENTS-->
+
+<!--COOKING-->
+<template id="cooking_list.html">
+  <ons-page id="cooking_list" modifier="kform_page kpage_pullhook" >  
+      
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Food</h3>
+	     <div class="sub_title rounded_tag trn">Cooking Reference</div>
+	     </div>
+	</div>
+	
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="CookingList"> 
+	<input type="hidden" name="delete_action" class="delete_action" value="CookingDelete"> 
+	<input type="hidden" name="get_action" class="get_action" value="CookingGetByID">
+    
+	<form id="frm_search_cooking" class="frm_search_cooking" method="POST" onsubmit="return false;" > 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required float></ons-input>
+	    <ons-button modifier="quiet" onclick="submitForm('.frm_search_cooking','CookingList')" >
+	    <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+    
+    <ons-fab position="bottom right" modifier="material mini" onclick="showPage('cooking_form.html');">
+     <ons-icon icon="md-plus"></ons-icon>
+    </ons-fab>
+
+</ons-page>
+</template>    
+
+
+<template id="cooking_form.html">
+  <ons-page id="cooking_form" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Food</h3>
+	     <div class="sub_title trn">Cooking Reference</div>
+	     </div>
+	</div>
+		
+	<form id="frm_cooking" class="frm_cooking" method="POST" onsubmit="return false" > 	  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_cooking','Addcooking')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+<!--END COOKING-->
+
+<!--ITEM LIST-->
+<template id="item_list.html">
+  <ons-page id="item_list" modifier="kform_page kpage_pullhook" >  
+      
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Food</h3>
+	     <div class="sub_title rounded_tag trn">Items</div>
+	     </div>
+	</div>
+	
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="ItemList"> 
+	<input type="hidden" name="delete_action" class="delete_action" value="ItemDelete"> 
+	<input type="hidden" name="get_action" class="get_action" value="ItemGetByID">
+    
+	<form id="frm_search_item" class="frm_search_item" method="POST" onsubmit="return false;" > 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required float></ons-input>
+	    <ons-button modifier="quiet" onclick="submitForm('.frm_search_item','ItemList')" >
+	    <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+    
+    <ons-fab position="bottom right" modifier="material mini" onclick="processAjax('getSizeList','');">
+     <ons-icon icon="md-plus"></ons-icon>
+    </ons-fab>
+
+</ons-page>
+</template>    
+
+
+<template id="item_form.html">
+  <ons-page id="item_form" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Food</h3>
+	     <div class="sub_title trn">Items</div>
+	     </div>
+	</div>
+		
+	<form id="frm_item_form" class="frm_item_form" method="POST" onsubmit="return false" > 	  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_item_form','AddItem')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+<!--END ITEM-->
+
+
+<!--SIZE LIST-->
+<template id="size_list.html">
+  <ons-page id="size_list" modifier="kform_page kpage_pullhook" >  
+      
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Food</h3>
+	     <div class="sub_title rounded_tag trn">size</div>
+	     </div>
+	</div>
+	
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="SizeList"> 
+	<input type="hidden" name="delete_action" class="delete_action" value="SizeDelete"> 
+	<input type="hidden" name="get_action" class="get_action" value="SizeGetByID">
+    
+	<form id="frm_search_size" class="frm_search_size" method="POST" onsubmit="return false;" > 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required float></ons-input>
+	    <ons-button modifier="quiet" onclick="submitForm('.frm_search_size','SizeList')" >
+	    <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+    
+    <ons-fab position="bottom right" modifier="material mini" onclick="showPage('size_form.html');">
+     <ons-icon icon="md-plus"></ons-icon>
+    </ons-fab>
+
+</ons-page>
+</template>    
+
+<template id="size_form.html">
+  <ons-page id="size_form" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Food</h3>
+	     <div class="sub_title trn">size</div>
+	     </div>
+	</div>
+		
+	<form id="frm_size" class="frm_size" method="POST" onsubmit="return false" > 	  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_size','AddSize')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+<!--END SIZE LIST-->
+
+
+<!--SHIPPING LIST-->
+<template id="shipping_list.html">
+  <ons-page id="shipping_list" modifier="kform_page kpage_pullhook" >  
+      
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections" >	
+         <div class="to_center">
+            <h3 class="trn">Delivery</h3>
+	       <div class="sub_title rounded_tag trn">Delivery Charges Rates</div>
+	     </div>
+	     
+	     <div class="to_center" style="margin-top:5px;">
+	       <ons-switch name="shipping_enabled" id="shipping_enabled" modifier="material" class="shipping_enabled"
+	       value="2" onclick="enabled_switch('shipping_enabled','enabled_shipping');" >
+	       </ons-switch>   
+	     </div>
+	     
+	</div>
+	
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="ShippingList"> 
+	<input type="hidden" name="delete_action" class="delete_action" value="ShippingDelete"> 
+	<input type="hidden" name="get_action" class="get_action" value="ShippingGetByID">
+    
+	<form id="frm_search_shipping" class="frm_search_shipping" method="POST" onsubmit="return false;" > 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required float></ons-input>
+	    <ons-button modifier="quiet" onclick="submitForm('.frm_search_shipping','ShippingList')" >
+	    <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+    
+    <ons-fab position="bottom right" modifier="material mini" onclick="showPage('shipping_form.html');">
+     <ons-icon icon="md-plus"></ons-icon>
+    </ons-fab>
+
+</ons-page>
+</template>    
+
+
+<template id="shipping_form.html">
+  <ons-page id="shipping_form" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Delivery</h3>
+	     <div class="sub_title trn">Delivery Charges Rates</div>
+	     </div>
+	</div>
+		
+	<form id="frm_shipping" class="frm_shipping" method="POST" onsubmit="return false" > 	  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_shipping','AddShipping')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+<!--END SHIPPING-->
+
+<!--OFFERS LIST-->
+<template id="offers_list.html">
+  <ons-page id="offers_list" modifier="kform_page kpage_pullhook" >  
+      
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections" >	
+         <div class="to_center">
+         <h3 class="trn">Discount</h3>
+	     <div class="sub_title rounded_tag trn">Offers</div>
+	     </div>
+	</div>
+	
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="OffersList"> 
+	<input type="hidden" name="delete_action" class="delete_action" value="OffersDelete"> 
+	<input type="hidden" name="get_action" class="get_action" value="OffersGetByID">
+    
+	<form id="frm_search_offers" class="frm_search_offers" method="POST" onsubmit="return false;"> 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required float></ons-input>
+	    <ons-button modifier="quiet" onclick="submitForm('.frm_search_offers','OffersList')" >
+	    <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+    
+    <ons-fab position="bottom right" modifier="material mini" onclick="showPage('offers_form.html');">
+     <ons-icon icon="md-plus"></ons-icon>
+    </ons-fab>
+
+</ons-page>
+</template>    
+
+<template id="gallery_settings.html">
+  <ons-page id="gallery_settings" modifier="kform_page kpage_pullhook" >  
+      
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+   <div class="top_sections" >	
+         <div class="to_center">
+         <h3 class="trn">Gallery</h3>
+	     <div class="sub_title rounded_tag trn">Settings</div>
+	     </div>
+	     
+	     <div class="to_center" style="margin-top:5px;">
+	       <ons-switch name="enabled_gallery" id="enabled_gallery" modifier="material" class="enabled_gallery"
+	       value="1" onclick="enabled_switch('enabled_gallery','enabled_gallery');" >
+	       </ons-switch>   
+	     </div>		
+	     
+	</div>
+	
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="GalleryList"> 	
+	<input type="hidden" name="delete_action" class="delete_action" value="DeleteGallery"> 
+	<input type="hidden" name="get_action" class="get_action" value="GetGallery">
+	
+	<input type="hidden" name="upload_option_name" class="upload_option_name" value="merchant_gallery">
+	<input type="hidden" name="upload_next_action" class="upload_next_action" value="list_reload">
+	<input type="hidden" name="upload_type" class="upload_type" value="2">
+	
+	<form id="frm_gallery" class="frm_gallery" method="POST" onsubmit="return false;"> 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required disabled float></ons-input>
+	    <ons-button modifier="quiet" disabled onclick="submitForm('.frm_gallery','gallery_list')" >
+	    <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+    	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+    
+    
+    <ons-fab position="bottom right" modifier="material" onclick="browseGallery()" >
+     <ons-icon icon="md-cloud-upload"></ons-icon>
+    </ons-fab>
+
+</ons-page>
+</template>    
+
+
+<template id="banner_settings.html">
+  <ons-page id="banner_settings" modifier="kform_page kpage_pullhook" >  
+      
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+   <div class="top_sections" >	
+         <div class="to_center">
+         <h3 class="trn">Banner</h3>
+	     <div class="sub_title rounded_tag trn">Settings</div>
+	     </div>
+	     
+	     <div class="to_center" style="margin-top:5px;">
+	       <ons-switch name="banner_enabled" id="banner_enabled" modifier="material" class="banner_enabled"
+	       value="1" onclick="enabled_switch('banner_enabled','banner_enabled');" >
+	       </ons-switch>   
+	     </div>		
+	     
+	</div>
+	
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="BannerList"> 	
+	<input type="hidden" name="delete_action" class="delete_action" value="DeleteBanner"> 
+	<input type="hidden" name="get_action" class="get_action" value="GetGallery">
+	
+	<input type="hidden" name="upload_option_name" class="upload_option_name" value="merchant_banner">
+	<input type="hidden" name="upload_next_action" class="upload_next_action" value="list_reload">
+	<input type="hidden" name="upload_type" class="upload_type" value="2">
+	
+	<form id="frm_banner" class="frm_banner" method="POST" onsubmit="return false;" > 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required disabled float></ons-input>
+	    <ons-button modifier="quiet" disabled onclick="submitForm('.frm_banner','banner_list')" >
+	    <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+    	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+    
+    
+    <ons-fab position="bottom right" modifier="material" onclick="browseGallery()" >
+     <ons-icon icon="md-cloud-upload"></ons-icon>
+    </ons-fab>
+
+</ons-page>
+</template>    
+
+
+<template id="offers_form.html">
+  <ons-page id="offers_form" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections" >	
+         <div class="to_center">
+         <h3 class="trn">Discount</h3>
+	     <div class="sub_title trn">Offers</div>
+	     </div>
+	</div>
+		
+	<form id="frm_offers" class="frm_offers" method="POST" onsubmit="return false" > 	  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_offers','AddOffers')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+<!--END OFFERS-->
+
+<!--VOUCHER LIST-->
+<template id="voucher_list.html">
+  <ons-page id="voucher_list" modifier="kform_page kpage_pullhook" >  
+      
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections" >	
+         <div class="to_center">
+         <h3 class="trn">Discount</h3>
+	     <div class="sub_title rounded_tag trn">Voucher</div>
+	     </div>
+	</div>
+	
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="VoucherList"> 
+	<input type="hidden" name="delete_action" class="delete_action" value="VoucherDelete"> 
+	<input type="hidden" name="get_action" class="get_action" value="VoucherGetByID">
+    
+	<form id="frm_search_voucher" class="frm_search_voucher" method="POST" onsubmit="return false;" > 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required float></ons-input>
+	    <ons-button modifier="quiet" onclick="submitForm('.frm_search_voucher','VoucherList')" >
+	    <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+    
+    <ons-fab position="bottom right" modifier="material mini" onclick="showPage('voucher_form.html');">
+     <ons-icon icon="md-plus"></ons-icon>
+    </ons-fab>
+
+</ons-page>
+</template>    
+
+<template id="voucher_form.html">
+  <ons-page id="voucher_form" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections" >	
+         <div class="to_center">
+         <h3 class="trn">Discount</h3>
+	     <div class="sub_title trn">Voucher</div>
+	     </div>
+	</div>
+		
+	<form id="frm_voucher" class="frm_voucher" method="POST" onsubmit="return false" > 	  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_voucher','AddVoucher')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+<!--END VOUCHER-->
+
+<!--MIN ORDER LIST-->
+<template id="mintable_list.html">
+  <ons-page id="mintable_list" modifier="kform_page kpage_pullhook" >  
+      
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections" >	
+         <div class="to_center">
+         <h3 class="trn">Table</h3>
+	     <div class="sub_title rounded_tag trn">Minimum Order Table</div>
+	     </div>
+	     
+	     <div class="to_center" style="margin-top:5px;">
+	       <ons-switch name="min_tables_enabled" id="min_tables_enabled" modifier="material" class="min_tables_enabled"
+	       value="1" onclick="enabled_switch('min_tables_enabled','enabled_min_table');" >
+	       </ons-switch>   
+	     </div>	
+	     
+	</div>
+	
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="MintableList"> 
+	<input type="hidden" name="delete_action" class="delete_action" value="MintableDelete"> 
+	<input type="hidden" name="get_action" class="get_action" value="MintableGetByID">
+    
+	<form id="frm_search_mintable" class="frm_search_mintable" method="POST" onsubmit="return false;" > 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required float></ons-input>
+	    <ons-button modifier="quiet" onclick="submitForm('.frm_search_mintable','MintableList')" >
+	    <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+    
+    <ons-fab position="bottom right" modifier="material mini" onclick="showPage('mintable_form.html');">
+     <ons-icon icon="md-plus"></ons-icon>
+    </ons-fab>
+
+</ons-page>
+</template>    
+
+<template id="mintable_form.html">
+  <ons-page id="mintable_form" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections" >	
+         <div class="to_center">
+         <h3 class="trn">Table</h3>
+	     <div class="sub_title trn">Minimum Order Table</div>
+	     </div>
+	</div>
+		
+	<form id="frm_mintable" class="frm_mintable" method="POST" onsubmit="return false" > 	  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_mintable','AddMintable')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+<!--END MIN ORDER-->
+
+<!--SCHEDULER LIST-->
+<template id="scheduler_list.html">
+  <ons-page id="scheduler_list" modifier="kform_page kpage_pullhook" >  
+      
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections" >	
+         <div class="to_center">
+         <h3 class="trn">Category</h3>
+	     <div class="sub_title rounded_tag trn">Scheduler</div>
+	     </div>
+	     
+	     <div class="to_center" style="margin-top:5px;">
+	      <ons-row> 
+	       <ons-col vertical-align="center" > 
+	           <span class="sub_title trn">Day schedule</span>    
+		       <ons-switch name="enabled_category_sked" id="enabled_category_sked" modifier="material" class="enabled_category_sked"
+		       value="1" onclick="enabled_switch('enabled_category_sked','enabled_category_sked');" >
+		       </ons-switch>   
+	       </ons-col>
+	       
+	       <ons-col vertical-align="center" >     	            
+	            <span class="sub_title trn">Time Schedule</span>    
+		       <ons-switch name="enabled_category_sked_time" id="enabled_category_sked_time" modifier="material" class="enabled_category_sked_time"
+		       value="1" onclick="enabled_switch('enabled_category_sked_time','enabled_category_sked_time');" >
+		       </ons-switch>   
+	       </ons-col>
+	       
+	       <ons-row>
+	       
+	     </div>		
+	     
+	</div>
+	
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="SchedulerList"> 
+	<input type="hidden" name="delete_action" class="delete_action" value="SchedulerDelete"> 
+	<input type="hidden" name="get_action" class="get_action" value="SchedulerGetByID">
+    
+	<form id="frm_search_scheduler" class="frm_search_scheduler" method="POST" onsubmit="return false;" > 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required float></ons-input>
+	    <ons-button modifier="quiet" onclick="submitForm('.frm_search_scheduler','SchedulerList')" >
+	    <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+        
+
+</ons-page>
+</template>    
+
+<template id="scheduler_form.html">
+  <ons-page id="scheduler_form" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections" >	
+         <div class="to_center">
+         <h3>Category</h3>
+	     <div class="sub_title">Scheduler</div>
+	     </div>
+	</div>
+		
+	<form id="frm_scheduler" class="frm_scheduler" method="POST" onsubmit="return false" > 	  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_scheduler','AddScheduler')" >
+	   SAVE
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+<!--END SCHEDULER-->
+
+
+<!--PAYMENT-->
+<template id="payment_list.html">
+  <ons-page id="payment_list" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections" >	
+         <div class="to_center">
+         <h3 class="trn">Payment gateway</h3>
+	     <div class="rounded_tag trn">Settings</div>
+	     </div>
+	</div>
+  
+	<ons-list modifier="klist">
+    <ons-list-header><span class="trn">List</span></ons-list-header>   
+    </ons-list>
+    
+    <div class="spacer"></div> 
+	
+  </ons-page>
+</template>    
+
+<template id="payment_settings.html">
+  <ons-page id="payment_settings" modifier="kform_page" >  
+
+    <ons-back-button></ons-back-button>
+  
+    <div class="top_sections" >	
+         <div class="to_center">
+         <h3></h3>
+	     <div class="rounded_tag trn">Settings</div>
+	     </div>
+	</div>
+  
+	<form id="frm_payment_settings" class="frm_payment_settings" method="POST" onsubmit="return false" > 	  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_payment_settings','SavePaymentSettings')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+	
+  </ons-page>
+</template>    
+
+
+<template id="obd_receive_list.html">
+  <ons-page id="obd_receive_list" modifier="kform_page kpage_pullhook" >  
+      
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections" >	
+         <div class="to_center">
+         <h3>Receive Bank Deposit</h3>
+	     <div class="sub_title">list</div>
+	     </div>
+	</div>
+	
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="ReceiveBankList"> 
+	<input type="hidden" name="delete_action" class="delete_action" value="ReceiveBankDelete"> 
+	<input type="hidden" name="get_action" class="get_action" value="ReceiveBankID">
+    
+	<form id="frm_search_obd_receive" class="frm_search_obd_receive" method="POST" onsubmit="return false;" > 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required float></ons-input>
+	    <ons-button modifier="quiet" onclick="submitForm('.frm_search_obd_receive','ReceiveBankList')" >
+	    <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+        
+</ons-page>
+</template>    
+<!--END PAYMENT-->
+
+<!--REVIEW-->
+<template id="reviews.html">
+  <ons-page id="reviews" modifier="kform_page kpage_pullhook" >  
+      
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Customer</h3>
+	     <div class="sub_title rounded_tag trn">reviews</div>
+	     </div>
+	</div>
+	
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="ReviewList"> 
+	<input type="hidden" name="delete_action" class="delete_action" value="ReviewDelete"> 
+	<input type="hidden" name="get_action" class="get_action" value="ReviewGetByID">
+    
+	<form id="frm_review" class="frm_review" method="POST" onsubmit="return false;" > 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required float></ons-input>
+	    <ons-button modifier="quiet" onclick="submitForm('.frm_review','ReviewList')" >
+	    <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+    
+
+</ons-page>
+</template>    
+
+
+<template id="review_form.html">
+  <ons-page id="review_form" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Customer</h3>
+	     <div class="sub_title trn">reviews</div>
+	     </div>
+	</div>
+		
+	<form id="frm_review_form" class="frm_review_form" method="POST" onsubmit="return false" > 	  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_review_form','AddReview')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+
+
+<template id="social_settings.html">
+  <ons-page id="social_settings" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections" >	
+         <div class="to_center">
+         <h3 class="trn">Social</h3>
+	     <div class="sub_title rounded_tag trn">Settings</div>
+	     </div>
+	</div>
+		
+	<form id="frm_social_settings" class="frm_social_settings" method="POST" onsubmit="return false" > 	  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_social_settings','SaveSocialSettings')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+
+
+<template id="alert_settings.html">
+  <ons-page id="alert_settings" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections" >	
+         <div class="to_center">
+         <h3 class="trn">Alert</h3>
+	     <div class="sub_title rounded_tag trn">Settings</div>
+	     </div>
+	</div>
+		
+	<form id="frm_alert_settings" class="frm_alert_settings" method="POST" onsubmit="return false" > 	  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_alert_settings','SaveAlertSettings')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+
+
+
+<template id="selection_list.html">
+<ons-page id="selection_list" modifier="" >  
+
+    <ons-toolbar modifier="normal_toolbar">
+      <div class="left"><ons-back-button></ons-back-button></div>
+      <div class="center page_title"></div>
+    </ons-toolbar>
+
+   
+  <ons-pull-hook class="pull_hook"></ons-pull-hook>
+
+  <input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+  <input type="hidden" name="list" class="list" value=""> 
+  <input type="hidden" name="field" class="field" value=""> 
+  <input type="hidden" name="list_type" class="list_type" value="multiple"> 
+  <input type="hidden" name="field2" class="field2" value=""> 
+  <input type="hidden" name="field_reference" class="field_reference" value=""> 
+  
+  <form id="frm_selection" class="frm_selection" method="POST" onsubmit="return false;" > 		  	   	         
+    <ons-list modifier="klist material">       
+    </ons-list>
+    
+    <div class="no_list"></div>
+    
+    <div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+  </form>
+    
+    <ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="setSelection();"  >
+	   <span class="trn">Done</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+    
+</ons-page>
+</template>    
+
+
+<template id="merchant_settings.html">
+  <ons-page id="merchant_settings" modifier="kform_page" >  
+    
+  <ons-back-button></ons-back-button>
+    
+    <div class="top_sections" >	
+         <div class="to_center">
+         <h3 class="trn">Merchant</h3>
+	     <div class="rounded_tag trn">Settings</div>
+	     </div>
+	</div>
+	
+	<form id="frm_merchant_settings" class="frm_merchant_settings" method="POST"> 		  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_merchant_settings','updateMerchantSettings')" >
+	   <span class="trn">Save Settings</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    	
+
+
+<template id="store_hours.html">
+  <ons-page id="store_hours" modifier="kform_page" >  
+    
+  <ons-back-button></ons-back-button>
+    
+    <div class="top_sections" >	
+         <div class="to_center">
+         <h3 class="trn">Store</h3>
+	     <div class="rounded_tag trn">opening hours</div>
+	     </div>
+	</div>
+	
+	<form id="frm_store_hours" class="frm_store_hours" method="POST"> 		  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_store_hours','StoreHours')" >
+	   <span class="trn">Save Settings</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    	
+
+<template id="time_picker.html">
+<ons-dialog id="time_picker" modifier="dialog_large" >
+<ons-page id="time_picker" modifier="">            
+<div class="content_inner">
+
+  <ons-button modifier="quiet button_close" onclick="document.getElementById('time_picker').hide();" >	      
+	      <ons-icon icon="md-close"></ons-icon>
+	</ons-button>
+
+   <input type="hidden" name="target_object" id="target_object" class="target_object">   
+   <input type="hidden" name="s_time_hour" id="s_time_hour" class="s_time_hour" value="">
+   <input type="hidden" name="s_time_mins" id="s_time_mins" class="s_time_mins" value="">
+   
+    <p class="trn">HOUR</p>
+    <div class="segment time_hour_segment"></div>           
+    
+    <p class="trn">MINUTES</p>
+    <div class="segment time_minutes_segment"></div>           
+   
+   <div>
+   <ons-button modifier="material large black_btn" onclick="showTimePickerValue();" >	   
+   <span class="trn">SET</span>
+   </ons-button>
+  </div>	   	  	   
+</div>  
+</ons-page>
+</ons-dialog>
+</template>  
+
+
+<!--ENTER PIN-->
+<template id="enter_pin.html">
+<ons-page id="enter_pin" modifier="login_screen" >  
+
+<div class="main_logo_wrap">
+  <img src="images/logo-k@2x.png" class="logo">
+  <h2 class="trn">Duken Food</h2>
+  <img src="images/merchantapp@2x.png" class="sub_logo">
+ </div>   
+ 
+<form id="frm_pin" class="frm_pin" method="POST" onsubmit="return false;"> 
+<ons-bottom-toolbar modifier="form_bottom is_center">
+
+<div class="field_label field_with_icon">
+<ons-input type="password" name="pin" id="pin" class="pin numeric_only" modifier="material underbar" 
+placeholder="Enter your PIN" maxlength="4" required float></ons-input>
+
+<ons-button modifier="quiet" onclick="changePassField( $(this) );" >
+  <ons-icon icon="md-eye"></ons-icon>
+</ons-button>
+
+</div>
+
+<div>
+<ons-button modifier="large material black_btn" onclick="submitForm('.frm_pin','ValidatePin')" >
+<span class="trn">SUBMIT</span>
+</ons-button>
+</div>
+
+<!--<div>
+<ons-button modifier="quiet material material--flat" onclick="resetToPage('forgot_pin.html','fade')">
+<span class="trn">Forgot your pin?</span>
+</ons-button>
+</div>-->
+
+<div class="spacer2"></div>
+
+<ons-row>
+   <ons-col vertical-align="center" width="50%" class="to_left" >     
+   <ons-button modifier="quiet material material--flat" onclick="resetToPage('forgot_pin.html','fade')">
+    <span class="trn">Forgot your pin?</span>
+  </ons-button>
+   </ons-col>
+   <ons-col vertical-align="center" width="50%" class="to_right" >
+      <ons-button modifier="quiet material material--flat" onclick="logout();">
+	   <span class="trn">Logout</span>
+	   </ons-button>
+   </ons-col>
+</ons-row>   
+
+</ons-bottom-toolbar>
+</form> 
+
+</ons-page>
+</template>
+<!--END ENTER PIN-->
+
+<!--FORGOT PIN-->
+<template id="forgot_pin.html">
+<ons-page id="forgot_pin" modifier="login_screen" >  
+
+<div class="main_logo_wrap">
+  <img src="images/logo-k@2x.png" class="logo">
+  <h2 class="trn">Duken Food</h2>
+  <img src="images/merchantapp@2x.png" class="sub_logo">
+ </div>   
+ 
+<form id="frm_forgot_pin" class="frm_forgot_pin" method="POST" onsubmit="return false;"> 
+<ons-bottom-toolbar modifier="form_bottom is_center">
+
+<div class="field_label">
+<ons-input name="email_address" id="email_address" modifier="material underbar" class="email_address"
+ placeholder="Email" required float></ons-input>
+</div>
+
+<div>
+<ons-button modifier="large material black_btn" onclick="submitForm('.frm_forgot_pin','forgotPin')" >
+<span class="trn">Send new PIN</span>
+</ons-button>
+</div>
+
+<div>
+<ons-button modifier="quiet material material--flat" onclick="resetToPage('enter_pin.html','fade')">
+<span class="trn">Enter pin</span>
+</ons-button>
+</div>
+
+</ons-bottom-toolbar>
+</form> 
+
+</ons-page>
+</template>
+<!--END FORGOT PIN-->
+
+<template id="map.html">
+<ons-page id="map" modifier="map" >  
+
+<ons-toolbar>
+<div class="left">
+    <div class="kcircle">
+      <div class="inner_kcirle"><ons-icon icon="md-navigation"></ons-icon></div>
+    </div>
+</div>
+<div class="center map_title"></div>
+<div class="right">
+   <ons-toolbar-button onclick="popPage();">
+      <ons-icon icon="md-close"></ons-icon>
+   </ons-toolbar-button>
+</div>
+  </ons-toolbar>  
+<input type="hidden" name="map_action" id="map_action" class="map_action">  
+<input type="hidden" name="map_lat" id="map_lat" class="map_lat">  
+<input type="hidden" name="map_lng" id="map_lng" class="map_lng">  
+<input type="hidden" name="mapbox_drag_map" id="mapbox_drag_map" class="mapbox_drag_map">  
+<input type="hidden" name="mapbox_drag_end" id="mapbox_drag_end" class="mapbox_drag_end">  
+
+<div class="map_wrap" id="map_wrap"></div>
+
+
+<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+<ons-button modifier="material large black_btn" onclick="setMapAction()" >
+<span class="trn">SET THIS LOCATION</span>
+</ons-button>	   
+</ons-bottom-toolbar>
+
+</ons-page>
+</template>
+
+
+<template id="orders_status_list.html">
+  <ons-page id="orders_status_list" modifier="kform_page kpage_pullhook" >  
+  
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+  <div class="top_sections">	
+	 <div class="to_center">
+	 <h3 class="trn">Orders</h3>
+	 <div class="rounded_tag trn">status</div>
+	 </div>
+  </div>
+    
+   <input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="orders_status_list"> 
+	<input type="hidden" name="delete_action" class="delete_action" value="DeleteOrderStatus"> 
+	<input type="hidden" name="get_action" class="get_action" value="OrderStatusGet">
+	
+	<form id="frm_status_order" class="frm_status_order" method="POST" onsubmit="return false;" > 
+	<div class="field_label field_with_icon">
+	<ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	placeholder="Search" required float></ons-input>
+	<ons-button modifier="quiet" onclick="submitForm('.frm_status_order','orders_status_list')" >
+	<ons-icon icon="md-search"></ons-icon>
+	</ons-button>
+	</div>
+	</form>		
+  
+  <ons-list modifier="list_column">    
+  </ons-list>  
+  
+  <div class="no_list"></div>
+  
+   <div  class="paginate_loader">
+	  <ons-progress-circular indeterminate></ons-progress-circular> 	  
+   </div>
+	
+   <div class="spacer"></div>
+    
+   <ons-fab position="bottom right" class="add" modifier="material mini" onclick="showPage('order_status_form.html');">
+     <ons-icon icon="md-plus"></ons-icon>
+    </ons-fab>
+    
+    <ons-fab position="bottom left" modifier="material mini" onclick="showPage('order_status_settings.html');">
+     <ons-icon icon="md-settings"></ons-icon>
+    </ons-fab>
+    
+  
+</ons-page>
+</template>  
+
+
+<template id="order_status_form.html">
+  <ons-page id="order_status_form" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Orders</h3>
+	     <div class="sub_title trn">status</div>
+	     </div>
+	</div>
+	
+	<form id="frm_order_status" class="frm_order_status" method="POST" onsubmit="return false"> 		  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_order_status','AddOrderStatus')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+
+
+<template id="order_status_settings.html">
+  <ons-page id="order_status_settings" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Orders</h3>
+	     <div class="sub_title trn">settings</div>
+	     </div>
+	</div>
+	
+	<form id="frm_order_status_settings" class="frm_order_status_settings" method="POST" onsubmit="return false"> 		  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_order_status_settings','SavedOrderStatusSettings')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+
+
+<template id="reports_menu.html">
+  <ons-page id="reports_menu" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Merchant</h3>
+	     <div class="rounded_tag trn">Reports</div>
+	     </div>
+	</div>
+		
+  <ons-list modifier="klist">   
+    <ons-list-header><span class="trn">&nbsp;</span></ons-list-header>
+  </ons-list>		
+
+</ons-page>
+</template>    
+
+
+<template id="reports.html">
+  <ons-page id="reports" modifier="kform_page" >  
+
+ 
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn title"></h3>
+	     <div class="sub_title rounded_tag trn">report</div>
+	     </div>
+	</div>
+    
+  
+  <input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+  <input type="hidden" name="list_action" class="list_action" value="">  
+
+   
+   <form id="frm_reports" class="frm_reports" method="POST" onsubmit="return false;" >
+   <input type="hidden" name="refresh" class="refresh" value="1"> 
+   </form>
+   
+  <ons-list modifier="list_report order_list"></ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+	  <ons-progress-circular indeterminate></ons-progress-circular> 
+	</div>
+	
+	<div class="spacer"></div>
+	
+</ons-page>
+</template>    	
+
+<template id="sms_alert.html">
+  <ons-page id="sms_alert" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections" >	
+         <div class="to_center">
+         <h3 class="trn">SMS alert</h3>
+	     <div class="sub_title rounded_tag trn">Settings</div>
+	     </div>
+	</div>
+		
+	<form id="frm_sms_alert" class="frm_sms_alert" method="POST" onsubmit="return false" > 	  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_sms_alert','SaveSMSAlertSettings')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+
+
+<template id="manage_credit_cards.html">
+  <ons-page id="manage_credit_cards" modifier="kform_page kpage_pullhook" >  
+      
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections" >	
+         <div class="to_center">
+            <h3 class="trn">Credit Card</h3>
+	       <div class="sub_title rounded_tag trn">Manage your cards</div>
+	     </div>
+	     	     
+	</div>
+	
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="CardList"> 
+	<input type="hidden" name="delete_action" class="delete_action" value="CardDelete"> 
+	<input type="hidden" name="get_action" class="get_action" value="CardGetByID">
+    
+	<form id="frm_card_list" class="frm_card_list" method="POST" onsubmit="return false;" > 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required float></ons-input>
+	    <ons-button modifier="quiet" onclick="submitForm('.frm_card_list','CardList')" >
+	    <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+    
+    <ons-fab position="bottom right" modifier="material mini" onclick="showPage('add_card.html');">
+     <ons-icon icon="md-plus"></ons-icon>
+    </ons-fab>
+
+</ons-page>
+</template>    
+
+
+<template id="add_card.html">
+  <ons-page id="add_card" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Credit card</h3>
+	     <div class="sub_title trn">Manage your cards</div>
+	     </div>
+	</div>
+		
+	<form id="frm_add_card" class="frm_add_card" method="POST" onsubmit="return false" > 	  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_add_card','AddCard')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+
+<template id="review_form_reply.html">
+  <ons-page id="review_form_reply" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Review</h3>
+	     <div class="sub_title trn">Add reply</div>
+	     </div>
+	</div>
+		
+	<form id="frm_review_reply" class="frm_review_reply" method="POST" onsubmit="return false" > 	  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_review_reply','AddReviewReply')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+
+
+<template id="broadcast_list.html">
+  <ons-page id="broadcast_list" modifier="kform_page kpage_pullhook" >  
+      
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections" >	
+         <div class="to_center">
+            <h3 class="trn">Push</h3>
+	       <div class="sub_title rounded_tag trn">Send push to your customer</div>
+	     </div>
+	     	     
+	</div>
+	
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="PushBroadcastList"> 
+	<input type="hidden" name="delete_action" class="delete_action" value="PushBroadcastDelete"> 
+	<input type="hidden" name="get_action" class="get_action" value="CardGetBroadcastByID">
+    
+	<form id="frm_broadcast" class="frm_broadcast" method="POST" onsubmit="return false;"> 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required float></ons-input>
+	    <ons-button modifier="quiet" onclick="submitForm('.frm_broadcast','PushBroadcastList')" >
+	    <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+    
+    <ons-fab position="bottom right" modifier="material mini" onclick="showPage('add_broadcast.html');">
+     <ons-icon icon="md-plus"></ons-icon>
+    </ons-fab>
+
+</ons-page>
+</template>    
+
+
+<template id="add_broadcast.html">
+  <ons-page id="add_broadcast" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Push</h3>
+	     <div class="sub_title trn">Send push to your customer</div>
+	     </div>
+	</div>
+		
+	<form id="frm_broacast" class="frm_broacast" method="POST" onsubmit="return false" > 	  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_broacast','AddBroadcast')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+
+<template id="driver_list.html">
+  <ons-page id="driver_list" modifier="kform_page kpage_pullhook" >  
+      
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections" >	
+         <div class="to_center">
+            <h3 class="trn">Assign to driver</h3>
+	       <div class="sub_title rounded_tag trn">assign order</div>
+	     </div>
+	     	     
+	</div>
+	
+	<input type="hidden" name="assign_order_id" class="assign_order_id" value="0"> 
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="DriverList"> 
+	<input type="hidden" name="delete_action" class="delete_action" value="DriverListDelete"> 
+	<input type="hidden" name="get_action" class="get_action" value="AssignOrder">
+    
+	<form id="frm_driver_list" class="frm_driver_list" method="POST" onsubmit="return false;"> 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required float></ons-input>
+	    <ons-button modifier="quiet" onclick="submitForm('.frm_driver_list','DriverList')" >
+	    <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+    
+     <ons-fab position="bottom right" modifier="material mini" onclick="showPage('add_driver.html');">
+     <ons-icon icon="md-plus"></ons-icon>
+    </ons-fab>
+        
+</ons-page>
+</template>    
+
+
+
+<template id="add_driver.html">
+  <ons-page id="add_driver" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Driver</h3>
+	     <div class="sub_title trn">Add new</div>
+	     </div>
+	</div>
+		
+	<form id="frm_driver" class="frm_driver" method="POST" onsubmit="return false" > 	  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_driver','AddDriver')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+
+
+<template id="driver_info.html">
+  <ons-page id="driver_info" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Driver profile</h3>
+	     <div class="sub_title rounded_tag trn">details</div>
+	     </div>
+	</div>
+	
+	<ons-list modifier="order_list">	  
+    </ons-list>  
+			
+
+</ons-page>
+</template>    
+
+
+<template id="printer_list.html">
+  <ons-page id="printer_list" modifier="kform_page kpage_pullhook" >  
+
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Printers</h3>
+	     <div class="sub_title rounded_tag trn">settings</div>
+	     </div>
+	</div>
+	
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="printerList"> 
+	<input type="hidden" name="delete_action" class="delete_action" value="printerDelete"> 
+	<input type="hidden" name="get_action" class="get_action" value="printerGet">
+    
+	<form id="frm_printer_list" class="frm_printer_list" method="POST" onsubmit="return false;" > 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required float></ons-input>
+	    <ons-button modifier="quiet" onclick="submitForm('.frm_printer_list','printerList')" >
+	      <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+    
+    <ons-fab position="bottom right" modifier="material mini" onclick="showPage('printer_add.html');">
+     <ons-icon icon="md-plus"></ons-icon>
+    </ons-fab>
+		
+</ons-page>
+</template>    
+
+
+<template id="printer_add.html">
+  <ons-page id="printer_add" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Add printer</h3>	     
+	     </div>
+	</div>
+  
+	<form id="frm_printer" class="frm_printer" method="POST"></form> 
+	
+	<ons-button modifier="material large yellow_btn" onclick="BT_print_test();" >
+	   <ons-icon icon="md-print"></ons-icon> <span class="trn">PRINT TEST</span>
+	</ons-button>
+	
+	
+	<div class="spacer"></div>
+	
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">	
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_printer','AddPrinter')" >	   
+	   <span class="trn">SAVE</span>
+	   </ons-button>
+	</ons-bottom-toolbar>
+	
+  </ons-page>
+</template>    
+
+
+
+<template id="printer_bt_list.html">
+  <ons-dialog id="printer_bt_list" modifier="dialog_medium dialog_white_bg" animation="none" >
+    <div class="content_inner">
+        
+    <ons-row >
+     <ons-col vertical-align="center" width="50px" >
+       <ons-progress-circular indeterminate></ons-progress-circular>
+     </ons-col>
+     <ons-col vertical-align="center" >
+        <h3 style="text-align:left;" class="trn">Bluetooth printer</h3>        
+     </ons-col>
+    </ons-row>
+          
+    <ons-list modifier="klist"></ons-list>  
+    
+    
+     <div class="postion_fixed_bottom">
+	   <ons-button modifier="quiet material material--flat" onclick="BT_close_dialog_device_list();" >
+	   <span class="trn">CANCEL</span>
+	   </ons-button>
+	 </div>
+                
+    </div> <!--content_inner-->
+  </ons-dialog>
+</template>
+
+
+<template id="printer_loader.html">
+  <ons-dialog id="printer_loader" modifier="dialog_printer_loader dialog_white_bg" animation="none">
+    <div class="content_inner">
+        
+    <ons-row >
+     <ons-col vertical-align="center" width="50px" >
+       <ons-progress-circular indeterminate></ons-progress-circular>
+     </ons-col>
+     <ons-col vertical-align="center" >
+       <h3 style="text-align:left;"></h3>
+     </ons-col>
+    </ons-row>
+                         
+    </div> <!--content_inner-->
+  </ons-dialog>
+</template>
+
+<template id="booking_settings.html">
+  <ons-page id="booking_settings" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Booking</h3>
+	     <div class="sub_title trn">settings</div>
+	     </div>
+	</div>
+	
+	<form id="frm_booking_settings" class="frm_booking_settings" method="POST" onsubmit="return false"> 		  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_booking_settings','SavedBookingSettings')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+
+<template id="access_fine_location_permission.html">
+  <ons-page id="access_fine_location_permission" modifier="kform_page_white" >  
+
+  <div class="to_center">
+  
+  <input type="hidden" name="page_next" class="page_next" id="page_next">
+  
+  <ons-icon icon="md-pin" style="font-size:30px;color:#fedc79"></ons-icon>
+  <h3 class="trn page_title"></h3>
+  
+  <p class="page_content"></p>
+
+  <img class="access_fine_image" src="images/street-map.png">
+
+  </div>
+  
+  <ons-bottom-toolbar modifier="form_bottom_small">		    
+  <ons-row>
+   <ons-col vertical-align="top" width="50%" class="to_left" >
+  
+   <ons-button modifier="quiet material material--flat remove_underline" onclick="popPage();">
+	   <span class="trn">No thanks</span>
+	</ons-button>
+   
+   </ons-col>
+   <ons-col vertical-align="top" width="50%" class="to_right" >
+   
+   <ons-button modifier="quiet material material--flat remove_underline" onclick="requestFineLocation();">
+	   <span class="trn">Turn on</span>
+	</ons-button>
+   
+   </ons-col>
+  </ons-row>
+  </ons-bottom-toolbar>
+  
+</ons-page>
+</template>    
+
+<template id="order_time_management_list.html">
+  <ons-page id="order_time_management_list" modifier="kform_page kpage_pullhook" >  
+      
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Order Time Management</h3>
+	     <div class="sub_title trn">Order Time Management is to limit the incoming orders.</div>
+	     </div>
+	</div>
+	
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="TimeList"> 
+	<input type="hidden" name="delete_action" class="delete_action" value="TimeDelete"> 
+	<input type="hidden" name="get_action" class="get_action" value="TimeGetByID">
+    
+	<form id="frm_time" class="frm_time" method="POST" onsubmit="return false;" > 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required float></ons-input>
+	    <ons-button modifier="quiet" onclick="submitForm('.frm_time','TimeList')" >
+	    <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+    
+    <ons-fab position="bottom right" modifier="material mini" onclick="showPage('time_form.html');">
+     <ons-icon icon="md-plus"></ons-icon>
+    </ons-fab>
+
+</ons-page>
+</template>    
+
+<template id="time_form.html">
+  <ons-page id="time_form" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Order Time Management</h3>
+	     <div class="sub_title trn">time</div>
+	     </div>
+	</div>
+		
+	<form id="frm_time_add" class="frm_time_add" method="POST" onsubmit="return false" > 	  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_time_add','AddTime')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+
+<template id="invoice_list.html">
+  <ons-page id="invoice_list" modifier="kform_page kpage_pullhook" >  
+      
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Invoice</h3>
+	     <div class="sub_title rounded_tag trn">list</div>
+	     </div>
+	</div>
+	
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="InvoiceList"> 
+	<input type="hidden" name="delete_action" class="delete_action" value="InvoiceDelete"> 
+	<input type="hidden" name="get_action" class="get_action" value="InvoiceGetByID">
+    
+	<form id="frm_invoice" class="frm_invoice" method="POST" onsubmit="return false;" > 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required float></ons-input>
+	    <ons-button modifier="quiet" onclick="submitForm('.frm_invoice','InvoiceList')" >
+	    <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+        
+
+</ons-page>
+</template>    
+
+
+<template id="shipping_list_location.html">
+  <ons-page id="shipping_list_location" modifier="kform_page kpage_pullhook" >  
+      
+  <ons-toolbar>
+   <div class="left"><ons-back-button></ons-back-button></div>      
+  </ons-toolbar>
+  
+  <ons-pull-hook id="pull_hook"></ons-pull-hook>
+  
+    <div class="top_sections" >	
+         <div class="to_center">
+            <h3 class="trn">Delivery</h3>
+	       <div class="sub_title rounded_tag trn">Delivery Charges Rates</div>
+	     </div>
+	     
+	     <!--<div class="to_center" style="margin-top:5px;">
+	       <ons-switch name="shipping_enabled" id="shipping_enabled" modifier="material" class="shipping_enabled"
+	       value="2" onclick="enabled_switch('shipping_enabled','enabled_shipping');" >
+	       </ons-switch>   
+	     </div>-->
+	     
+	</div>
+	
+	<input type="hidden" name="end_of_list" class="end_of_list" value="0"> 
+	<input type="hidden" name="list_action" class="list_action" value="ShippingLocationList"> 
+	<input type="hidden" name="delete_action" class="delete_action" value="ShippingLocationDelete"> 
+	<input type="hidden" name="get_action" class="get_action" value="ShippingLocationGetByID">
+    
+	<form id="frm_search_shipping_loc" class="frm_search_shipping_loc" method="POST" onsubmit="return false;" > 
+	<div class="field_label field_with_icon">
+	   <ons-input type="text" name="s" id="s" modifier="material underbar"	   
+	    placeholder="Search" required float></ons-input>
+	    <ons-button modifier="quiet" onclick="submitForm('.frm_search_shipping_loc','ShippingLocationList')" >
+	    <ons-icon icon="md-search"></ons-icon>
+	    </ons-button>
+	</div>
+	</form>
+	
+	<ons-list modifier="list_column"> 
+	</ons-list>
+	
+	<div class="no_list"></div>
+	
+	<div  class="paginate_loader">
+      <ons-progress-circular indeterminate></ons-progress-circular> 
+    </div>
+    
+    <div class="spacer"></div>
+    
+    <ons-fab position="bottom right" modifier="material mini" onclick="showPage('shipping_location_form.html');">
+     <ons-icon icon="md-plus"></ons-icon>
+    </ons-fab>
+
+</ons-page>
+</template>    
+
+<template id="shipping_location_form.html">
+  <ons-page id="shipping_location_form" modifier="kform_page" >  
+
+  <ons-back-button></ons-back-button>
+  
+    <div class="top_sections">	
+         <div class="to_center">
+         <h3 class="trn">Delivery</h3>
+	     <div class="sub_title trn">Delivery Charges Rates</div>
+	     </div>
+	</div>
+		
+	<form id="frm_shipping_location" class="frm_shipping_location" method="POST" onsubmit="return false" > 	  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_shipping_location','AddShippingLocation')" >
+	   <span class="trn">SAVE</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+
+</ons-page>
+</template>    
+
+<template id="signup.html">
+<ons-page id="signup" modifier="yellow_page kform_page" >  
+
+<ons-toolbar>
+  <div class="left"><ons-back-button></ons-back-button></div> 
+  <div class="center trn"></div>
+</ons-toolbar>
+
+	
+    <form id="frm_signup" class="frm_signup" method="POST" onsubmit="return false" > 	  	   	   
+	</form>
+	
+	<div class="spacer"></div>
+
+	<ons-bottom-toolbar modifier="form_bottom_small is_center">		   
+	   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_signup','Signup')" >
+	   <span class="trn">SIGNUP</span>
+	   </ons-button>	   
+	</ons-bottom-toolbar>
+	  	
+	
+  
+</ons-page>
+</template>    
+
+
+<template id="package_list.html">
+<ons-page id="package_list" modifier="yellow_page kform_page" >  
+<ons-toolbar>
+  <div class="left"><ons-back-button></ons-back-button></div> 
+  <div class="center trn"></div>
+</ons-toolbar>
+
+<div class="field_label">
+<div class="content_inner">
+<h3 class="trn">Please select one of our package</h3>
+</div>
+<form id="frm_package" class="frm_package" method="POST" onsubmit="return false" > 	  	   	   
+<input type="hidden" name="activation_token" id="activation_token" class="activation_token">
+<ons-list modifier="material">
+</ons-list>
+</form>
+</div>
+<div class="spacer"></div>
+
+   <ons-button modifier="material large black_btn" onclick="submitForm('.frm_package','SetPackage')" >
+   <span class="trn">CONTINUE</span>
+   </ons-button>	 
+   
+     <div class="to_center">
+	   <ons-button modifier="quiet material material--flat" onclick="resetToPage('page_login.html','fade')">
+	   <span class="trn">Go to login</span>
+	   </ons-button>
+	 </div>       
+
+</ons-page>
+</template>    
+
+
+<template id="signup_payment_list.html">
+<ons-page id="signup_payment_list" modifier="yellow_page kform_page" >  
+<ons-toolbar>
+  <div class="left"><ons-back-button></ons-back-button></div> 
+  <div class="center trn"></div>
+</ons-toolbar>
+
+<div class="field_label">
+<div class="content_inner">
+<h3 class="trn">Select payment</h3>
+</div>
+<form id="frm_signup_payment" class="frm_signup_payment" method="POST" onsubmit="return false" > 	  	   	   
+<input type="hidden" name="activation_token" id="activation_token" class="activation_token">
+<ons-list modifier="material">
+</ons-list>
+</form>
+</div>
+
+<ons-button modifier="material large black_btn" onclick="initPayment('.frm_signup_payment')" >
+<span class="trn">CONTINUE</span>
+</ons-button>	 
+
+<div class="to_center">
+<ons-button modifier="quiet material material--flat" onclick="resetToPage('page_login.html','fade')">
+<span class="trn">Go to login</span>
+</ons-button>
+</div>       
+	 
+</ons-page>
+</template>    
+
+
+<template id="signup_verification.html">
+<ons-page id="signup_verification" modifier="yellow_page kform_page" >  
+
+<div class="field_label">
+<div class="content_inner">
+<h3 class="trn">OPT Verification</h3>
+<p class="trn">please enter the verification code we sent to your email</p>
+<form id="frm_signup_verification" class="frm_signup_verification" method="POST" onsubmit="return false" > 	  	   	   
+</form>
+</div>
+
+<div class="spacer"></div>
+
+<ons-bottom-toolbar modifier="form_bottom is_center">		   
+<ons-button modifier="material large black_btn" onclick="submitForm('.frm_signup_verification','VerifySignupCode')" >
+<span class="trn">SUBMIT</span>
+</ons-button>	   
+
+<div class="to_center">
+<ons-button modifier="quiet material material--flat" onclick="resetToPage('page_login.html','fade')">
+<span class="trn">Go to login</span>
+</ons-button>
+</div>       
+
+</ons-bottom-toolbar>
+	
+</ons-page>
+</template>    
+
+
+<template id="signup_thankyou.html">
+<ons-page id="signup_thankyou" modifier="yellow_page kform_page" >  
+
+<div class="main_logo_wrap">
+  <img src="images/logo-k@2x.png" class="logo">
+  <h2>Duken Food</h2>
+  <img src="images/merchantapp@2x.png" class="sub_logo">
+ </div>          
+
+<div class="spacer"></div>
+
+<div class="field_label">
+<div class="content_inner">
+<h3 class="trn message_1">Thank you!</h3>
+<p class="trn message_2">Congratulation your merchant is now ready.</p>
+
+<div class="spacer"></div>
+
+<div class="to_center">
+<ons-button modifier="quiet material material--flat" onclick="resetToPage('page_login.html','fade')">
+<span class="trn">login to your account</span>
+</ons-button>
+</div>       
+
+</div>
+
+</ons-page>
+</template>    
+
+
+</body>
+</html>
